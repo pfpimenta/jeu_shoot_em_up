@@ -1,0 +1,9 @@
+
+
+En vous inspirant du programme précédent, réalisez un mini projet permettant de jouer au casse briques ou à tout autre "jeu" permettant l'interaction avec un objet animé (uniquement en 2D cette fois).
+
+Vous pouvez ajoutez les classes externes de votre choix.
+Vous pouvez repartir du programme 8 ou 9 si cela vous aide.
+
+Vous rendrez votre code pour la date indiquée sur le dépôt de fichier.
+
