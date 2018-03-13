@@ -24,15 +24,16 @@ public:
     void setSpeed(int x, int y);
     vec2 getSpeed();
     void move();
+    void loadImage(std::string img_path);
     
     
-    QPixmap *pixmap; // l'image
+    //QPixmap *pixmap; // l'image
 
 
 private:
   vec2 position;
   vec2 speed;
-  //QPixmap *pixmap; // l'image
+  QPixmap *pixmap; // l'image
 
 };
 

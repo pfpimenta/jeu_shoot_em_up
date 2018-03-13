@@ -41,3 +41,8 @@ void Objet_bougeant::move(){
   this->position = vec2(this->position.x+this->speed.x, this->position.y+this->speed.y);
 }
 
+void loadImage(std::string img_path){
+  // loads the sprite of the objet
+  //this->pixmap
+}
+

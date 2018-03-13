@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QLabel>
+#include <QPixmap>
 
 #include <iostream>
 #include <cassert>
@@ -30,7 +31,8 @@ render_area::render_area(QWidget *parent)
     timer.start(30); //every 30ms
     
    std::cout<<"debug1"<<std::endl;
-   vaisseau.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/Bureau/Maj_Img/c_plus_plus/tp2/partie_10/images/vaisseau.png");
+   //vaisseau loadImage
+   //vaisseau.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/Bureau/Maj_Img/c_plus_plus/tp2/partie_10/images/vaisseau.png");
    std::cout<<"debug2"<<std::endl;
 
 

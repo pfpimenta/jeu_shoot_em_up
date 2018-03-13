@@ -28,7 +28,7 @@ CXX=g++
 
 
 main: main.o window.o moc_window.o render_area.o moc_render_area.o vec2.o circle.o Objet_bougeant.o Navette.o Vaisseau.o
-	${CXX} $^ -o $@ ${LDFLAGS}
+	${CXX} $^ -o shoot_em_up ${LDFLAGS}
 
 main.o: main.cpp window.hpp
 window.o: window.cpp window.hpp ui_mainwindow.h
