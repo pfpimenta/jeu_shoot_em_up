@@ -51,4 +51,4 @@ ui_mainwindow.h: mainwindow.ui
 	${UIC} $< -o $@
 
 clean:
-	rm -f *~ *.o moc_* ui_* main
+	rm -f *~ *.o moc_* ui_* main shoot_em_up
