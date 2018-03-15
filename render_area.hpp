@@ -34,10 +34,15 @@ public:
 
     /** Draw or not the circle when called */
     void change_draw_circle_state();
+    
 
 protected:
     /** Actual drawing function */
     void paintEvent(QPaintEvent *event);
+    
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
+
 
 private slots:
 
@@ -59,6 +64,10 @@ private: //attributes
 
     /** The circle */
     circle circ;
+    
+    // fond
+    Objet_bougeant fond1;
+    Objet_bougeant fond2;
     /** The vaisseau */
     Vaisseau vaisseau;
     /** The speed of the circle */
@@ -70,6 +79,7 @@ private: //attributes
     QTimer timer;
     /** Time accessor */
     QTime time;
+    QPixmap *pixmap;
 
 };
 

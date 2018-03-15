@@ -6,17 +6,33 @@
 //includes
 
 #include "Vaisseau.hpp"
-
+#include <QKeyEvent>
 
 
 Vaisseau::Vaisseau()
 {
     std::cout<<"Constructor of Vaisseau is called"<<std::endl;
-    setPosition(0, 0);
+    setPosition(100, 200);
 }
 
 Vaisseau::~Vaisseau()
 {
     std::cout<<"Destructor of Vaisseau is called"<<std::endl;
 }
+void Vaisseau::debugFonction(){
+      std::cout<<"DEBUG VAISSEAU"<<std::endl;
 
+}
+
+void Vaisseau::moveUpToggle(bool move){
+  moveUp = move;
+}
+void Vaisseau::moveDownToggle(bool move){
+  moveDown = move;
+}
+void Vaisseau::moveRightToggle(bool move){
+  moveRight = move;
+}
+void Vaisseau::moveLeftToggle(bool move){
+  moveLeft = move;
+}

@@ -19,10 +19,19 @@ public:
 
     Vaisseau();
     ~Vaisseau();
+    void debugFonction();
+    void moveUpToggle(bool move);
+    void moveDownToggle(bool move);
+    void moveRightToggle(bool move);
+    void moveLeftToggle(bool move);
 
 private:
   vec2 position;
   vec2 speed;
+  bool moveUp;
+  bool moveDown;
+  bool moveRight;
+  bool moveLeft;
 };
 
 

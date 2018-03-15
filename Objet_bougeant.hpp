@@ -11,6 +11,8 @@
 //includes
 #include "vec2.hpp"
 #include <QPixmap>
+#include <QKeyEvent>
+class QPixmap;
 
 class Objet_bougeant
 {
@@ -25,15 +27,11 @@ public:
     vec2 getSpeed();
     void move();
     void loadImage(std::string img_path);
-    
-    
-    //QPixmap *pixmap; // l'image
-
+    QPixmap *pixmap; // l'image
 
 private:
   vec2 position;
   vec2 speed;
-  QPixmap *pixmap; // l'image
 
 };
 

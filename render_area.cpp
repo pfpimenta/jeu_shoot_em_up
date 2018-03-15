@@ -14,10 +14,16 @@
 #include <iostream>
 #include <cassert>
 
+
+#define WINDOW_WIDTH 852
+#define WINDOW_HEIGHT 676
+
+
 render_area::render_area(QWidget *parent)
     :QWidget(parent),
-      circ({200,150},25),
       vaisseau(),
+      fond1(), // fond
+      fond2(), // fond
       speed(0.0f,0.0f),
       dt(1/5.0f),
       timer(),
@@ -29,13 +35,16 @@ render_area::render_area(QWidget *parent)
     //timer calling the function update_timer periodicaly
     connect(&timer, SIGNAL(timeout()), this, SLOT(update_timer()));
     timer.start(30); //every 30ms
-    
-   std::cout<<"debug1"<<std::endl;
+ 
    //vaisseau loadImage
-   //vaisseau.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/Bureau/Maj_Img/c_plus_plus/tp2/partie_10/images/vaisseau.png");
-   std::cout<<"debug2"<<std::endl;
-
-
+   vaisseau.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/jeu_shoot_em_up/images/vaisseau.png");
+   //fond loadImage
+   fond1.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/jeu_shoot_em_up/images/background.png");
+   fond2.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/jeu_shoot_em_up/images/background.png");
+   
+   fond1.setSpeed(-1,0);
+   fond2.setSpeed(-1,0);
+   fond2.setPosition(852,0);
 }
 
 render_area::~render_area()
@@ -58,11 +67,73 @@ void render_area::paintEvent(QPaintEvent*)
     brush.setStyle(Qt::SolidPattern);
     painter.setBrush(brush);
 
-    //the actual drawing of the circle
-    vec2 const& p=circ.center;
-    float const r=circ.radius;
-    painter.drawEllipse(p.x-r,p.y-r,2*r,2*r);
+    // movement du fond
+    fond1.move();
+    vec2 pos = fond1.getPosition();
+    if(pos.x == -852)
+      fond1.setPosition(852, pos.y);
+    fond2.move();
+    pos = fond2.getPosition();
+    if(pos.x == -852)
+      fond2.setPosition(852, pos.y);
+    // movement des objets     
+    
+    
+     // afficher le fond
+    pos = fond1.getPosition();
+    painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond1.pixmap);
+    pos = fond2.getPosition();
+    painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond2.pixmap);
+     // afficher le vaisseau
+    pos = vaisseau.getPosition();
+    painter.drawPixmap(pos.x,pos.y,200,120,*vaisseau.pixmap);
 }
+
+ 
+void render_area::keyPressEvent(QKeyEvent *event)
+{
+  //std::cout<<"keyPressEvent appelle"<<std::endl;
+  
+  if(event->key() == Qt::Key_Left) {
+      std::cout<<"left"<<std::endl;
+      vaisseau.moveLeftToggle(true);
+      vec2 pos = vaisseau.getPosition();
+      vaisseau.setPosition(pos.x - 2, pos.y);
+  }else if(event->key() == Qt::Key_Right) {
+      std::cout<<"right"<<std::endl;
+      vaisseau.moveRightToggle(true);
+      vec2 pos = vaisseau.getPosition();
+      vaisseau.setPosition(pos.x + 2, pos.y);
+  }else if(event->key() == Qt::Key_Down) {
+      std::cout<<"down"<<std::endl;
+      vaisseau.moveDownToggle(true);
+      vec2 pos = vaisseau.getPosition();
+      vaisseau.setPosition(pos.x, pos.y+2);
+  }else if(event->key() == Qt::Key_Up) {
+      std::cout<<"up"<<std::endl;
+      vaisseau.moveUpToggle(true);
+      vec2 pos = vaisseau.getPosition();
+      vaisseau.setPosition(pos.x, pos.y - 2);
+  }
+}
+
+void render_area::keyReleaseEvent(QKeyEvent *event)
+{
+  if(event->key() == Qt::Key_Left) {
+      std::cout<<"left off"<<std::endl;
+      vaisseau.moveLeftToggle(false);
+  }else if(event->key() == Qt::Key_Right) {
+      std::cout<<"right off"<<std::endl;
+      vaisseau.moveRightToggle(false);
+  }else if(event->key() == Qt::Key_Down) {
+      std::cout<<"down off"<<std::endl;
+      vaisseau.moveDownToggle(false);
+  }else if(event->key() == Qt::Key_Up) {
+      std::cout<<"up off"<<std::endl;
+      vaisseau.moveUpToggle(false);
+  }
+}
+ 
 
 void render_area::update_timer()
 {

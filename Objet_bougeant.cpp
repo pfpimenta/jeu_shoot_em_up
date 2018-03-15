@@ -8,8 +8,7 @@
 #include "Objet_bougeant.hpp"
 
 
-
-Objet_bougeant::Objet_bougeant()
+Objet_bougeant::Objet_bougeant():      pixmap(new QPixmap)
 {
     std::cout<<"Constructor of Objet_bougeant is called"<<std::endl;
     setPosition(0, 0);
