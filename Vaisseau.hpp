@@ -19,6 +19,7 @@ public:
 
     Vaisseau();
     ~Vaisseau();
+    void setPosition(int x, int y);
     void debugFonction();
     void moveUpToggle(bool move);
     void moveDownToggle(bool move);

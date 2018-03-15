@@ -15,9 +15,11 @@
 #include <QTimer>
 #include <QTime>
 #include <list>
+#include <vector>
 
 #include "Vaisseau.hpp"
-
+#include "Ennemi.hpp"
+ 
 
 //forward declaration of QLabel
 class QLabel;
@@ -48,6 +50,8 @@ private slots:
 
     /** Function called periodically at constant time interval by a timer */
     void update_timer(); 
+    void spawn_ennemi();
+
 
 private: //functions
 
@@ -70,6 +74,8 @@ private: //attributes
     Objet_bougeant fond2;
     /** The vaisseau */
     Vaisseau vaisseau;
+    /** The vaisseau */
+    std::vector<Ennemi> ennemis;
     /** The speed of the circle */
     vec2 speed;
     /** The time integration step */
@@ -77,6 +83,8 @@ private: //attributes
 
     /** Timer for periodic time iteration */
     QTimer timer;
+    /** Timer for ennemy spawning */
+    QTimer ennemiTimer;
     /** Time accessor */
     QTime time;
     QPixmap *pixmap;

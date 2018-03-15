@@ -22,11 +22,13 @@
 render_area::render_area(QWidget *parent)
     :QWidget(parent),
       vaisseau(),
+      ennemis(),
       fond1(), // fond
       fond2(), // fond
       speed(0.0f,0.0f),
       dt(1/5.0f),
       timer(),
+      //ennemiTimer(),
       time()
 {
     setBackgroundRole(QPalette::Base);
@@ -35,9 +37,10 @@ render_area::render_area(QWidget *parent)
     //timer calling the function update_timer periodicaly
     connect(&timer, SIGNAL(timeout()), this, SLOT(update_timer()));
     timer.start(30); //every 30ms
- 
-   //vaisseau loadImage
-   vaisseau.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/jeu_shoot_em_up/images/vaisseau.png");
+    //timer calling the function update_timer periodicaly
+    //connect(&ennemiTimer, SIGNAL(timeout()), this, SLOT(spawn_ennemi()));
+    //ennemiTimer.start(5000); //every 5000ms=5s
+      
    //fond loadImage
    fond1.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/jeu_shoot_em_up/images/background.png");
    fond2.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/jeu_shoot_em_up/images/background.png");
@@ -45,6 +48,11 @@ render_area::render_area(QWidget *parent)
    fond1.setSpeed(-1,0);
    fond2.setSpeed(-1,0);
    fond2.setPosition(852,0);
+   
+   // ennemi
+   Ennemi* testEnnemi = new Ennemi();
+   ennemis.push_back(*testEnnemi);
+   
 }
 
 render_area::~render_area()
@@ -70,14 +78,20 @@ void render_area::paintEvent(QPaintEvent*)
     // movement du fond
     fond1.move();
     vec2 pos = fond1.getPosition();
-    if(pos.x == -852)
-      fond1.setPosition(852, pos.y);
+    if(pos.x == -WINDOW_WIDTH)
+      fond1.setPosition(WINDOW_WIDTH, pos.y);
     fond2.move();
     pos = fond2.getPosition();
-    if(pos.x == -852)
-      fond2.setPosition(852, pos.y);
+    if(pos.x == -WINDOW_WIDTH)
+      fond2.setPosition(WINDOW_WIDTH, pos.y);
     // movement des objets     
-    
+    for(auto& ennemi : ennemis){
+        pos = ennemi.getPosition();
+	ennemi.move();
+    }
+    // movement de la vaisseau     
+    vaisseau.move();
+
     
      // afficher le fond
     pos = fond1.getPosition();
@@ -86,7 +100,12 @@ void render_area::paintEvent(QPaintEvent*)
     painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond2.pixmap);
      // afficher le vaisseau
     pos = vaisseau.getPosition();
-    painter.drawPixmap(pos.x,pos.y,200,120,*vaisseau.pixmap);
+    painter.drawPixmap(pos.x,pos.y,180,100,*vaisseau.pixmap);
+     // afficher les ennemis
+    for(auto& ennemi : ennemis){
+        pos = ennemi.getPosition();
+	painter.drawPixmap(pos.x,pos.y,100,75,*ennemi.pixmap); 
+    }
 }
 
  
@@ -97,49 +116,81 @@ void render_area::keyPressEvent(QKeyEvent *event)
   if(event->key() == Qt::Key_Left) {
       std::cout<<"left"<<std::endl;
       vaisseau.moveLeftToggle(true);
-      vec2 pos = vaisseau.getPosition();
-      vaisseau.setPosition(pos.x - 2, pos.y);
+      vec2 vitesse = vaisseau.getSpeed();
+      if(vitesse.x <= -4){
+	vaisseau.setSpeed(vitesse.x, vitesse.y);
+      }else{
+	vaisseau.setSpeed(vitesse.x-1, vitesse.y);
+      }
+      
   }else if(event->key() == Qt::Key_Right) {
       std::cout<<"right"<<std::endl;
       vaisseau.moveRightToggle(true);
-      vec2 pos = vaisseau.getPosition();
-      vaisseau.setPosition(pos.x + 2, pos.y);
+      vec2 vitesse = vaisseau.getSpeed();
+      if(vitesse.x >= 4){
+	vaisseau.setSpeed(vitesse.x, vitesse.y);
+      }else{
+	vaisseau.setSpeed(vitesse.x+1, vitesse.y);
+      }
   }else if(event->key() == Qt::Key_Down) {
       std::cout<<"down"<<std::endl;
       vaisseau.moveDownToggle(true);
-      vec2 pos = vaisseau.getPosition();
-      vaisseau.setPosition(pos.x, pos.y+2);
+      vec2 vitesse = vaisseau.getSpeed();
+      if(vitesse.y >= 4){
+	vaisseau.setSpeed(vitesse.x, vitesse.y);
+      }else{
+	vaisseau.setSpeed(vitesse.x, vitesse.y+1);
+      }
   }else if(event->key() == Qt::Key_Up) {
       std::cout<<"up"<<std::endl;
       vaisseau.moveUpToggle(true);
-      vec2 pos = vaisseau.getPosition();
-      vaisseau.setPosition(pos.x, pos.y - 2);
+      vec2 vitesse = vaisseau.getSpeed();
+      if(vitesse.y <= -4){
+	vaisseau.setSpeed(vitesse.x, vitesse.y);
+      }else{
+	vaisseau.setSpeed(vitesse.x, vitesse.y-1);
+      }
   }
 }
 
 void render_area::keyReleaseEvent(QKeyEvent *event)
-{
-  if(event->key() == Qt::Key_Left) {
-      std::cout<<"left off"<<std::endl;
-      vaisseau.moveLeftToggle(false);
-  }else if(event->key() == Qt::Key_Right) {
-      std::cout<<"right off"<<std::endl;
-      vaisseau.moveRightToggle(false);
-  }else if(event->key() == Qt::Key_Down) {
-      std::cout<<"down off"<<std::endl;
-      vaisseau.moveDownToggle(false);
-  }else if(event->key() == Qt::Key_Up) {
-      std::cout<<"up off"<<std::endl;
-      vaisseau.moveUpToggle(false);
-  }
+  {
+    if(event->isAutoRepeat())
+      return;
+    if(event->key() == Qt::Key_Left) {
+	std::cout<<"left off"<<std::endl;
+	vaisseau.moveLeftToggle(false);
+	vec2 vitesse = vaisseau.getSpeed();
+	vaisseau.setSpeed(0, vitesse.y);
+    }else if(event->key() == Qt::Key_Right) {
+	std::cout<<"right off"<<std::endl;
+	vaisseau.moveRightToggle(false);
+	vec2 vitesse = vaisseau.getSpeed();
+	vaisseau.setSpeed(0, vitesse.y);
+    }else if(event->key() == Qt::Key_Down) {
+	std::cout<<"down off"<<std::endl;
+	vaisseau.moveDownToggle(false);
+	vec2 vitesse = vaisseau.getSpeed();
+	vaisseau.setSpeed(vitesse.x, 0);
+    }else if(event->key() == Qt::Key_Up) {
+	std::cout<<"up off"<<std::endl;
+	vaisseau.moveUpToggle(false);
+	vec2 vitesse = vaisseau.getSpeed();
+	vaisseau.setSpeed(vitesse.x, 0);
+    }
 }
  
 
 void render_area::update_timer()
 {
     //called periodically
-    
     repaint();
+}
+
+void render_area::spawn_ennemi()
+{
+    //called periodically
+    std::cout<<"spawn ennemi"<<std::endl;
 }
 
 
