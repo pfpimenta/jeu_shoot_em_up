@@ -27,18 +27,21 @@
 #define TAILLE_TIRE_X 20
 #define TAILLE_TIRE_Y 18
 
+#define DIST_HIT 200 //''hitbox''
 
 render_area::render_area(QWidget *parent)
-    :QWidget(parent),
-      vaisseau(),
-      ennemis(),
-      fond1(), // fond
-      fond2(), // fond
-      speed(0.0f,0.0f),
-      dt(1/5.0f),
-      timer(),
-      ennemiTimer(),
-      time()
+          :QWidget(parent),
+          num_ennemis_echapes(0),
+          fond1(), // fond
+          fond2(), // fond
+          vaisseau(),
+          ennemis(),
+          tires(),
+          speed(0.0f,0.0f),
+          dt(1/5.0f),
+          timer(),
+          ennemiTimer(),
+          time()
 {
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -49,19 +52,19 @@ render_area::render_area(QWidget *parent)
     //timer calling the function update_timer periodicaly
     connect(&ennemiTimer, SIGNAL(timeout()), this, SLOT(spawn_ennemi()));
     ennemiTimer.start(5000); //every 5000ms=5s
-      
+
    //fond loadImage
    fond1.pixmap->load("images/background.png");
    fond2.pixmap->load("images/background.png");
-   
+
    fond1.setSpeed(-1,0);
    fond2.setSpeed(-1,0);
    fond2.setPosition(WINDOW_WIDTH,0);
-   
+
    // ennemi
-   Ennemi* testEnnemi = new Ennemi();
-   ennemis.push_back(*testEnnemi);
-   
+   //Ennemi* testEnnemi = new Ennemi();
+   //ennemis.push_back(*testEnnemi);
+
 }
 
 render_area::~render_area()
@@ -93,12 +96,12 @@ void render_area::paintEvent(QPaintEvent*)
     pos = fond2.getPosition();
     if(pos.x == -WINDOW_WIDTH)
       fond2.setPosition(WINDOW_WIDTH, pos.y);
-    // movement des ennemis     
+    // movement des ennemis
     for(auto& ennemi : ennemis){
         pos = ennemi.getPosition();
 	ennemi.move();
     }
-    // movement de la vaisseau     
+    // movement de la vaisseau
     vaisseau.move();
     // movement des tires
         for(auto& tire : tires){
@@ -107,7 +110,33 @@ void render_area::paintEvent(QPaintEvent*)
     }
 
 
-    
+    std::vector<Ennemi>::iterator it;
+    for (it = ennemis.begin(); it != ennemis.end(); it++)
+    {
+      Ennemi ennemi = *it;
+      vec2 pos = ennemi.getPosition();
+      //ennemis qui ont ete frappe par un tire
+      std::vector<Tire>::iterator itTire;
+      for(itTire = tires.begin(); itTire != tires.end(); itTire++){
+          Tire tire = *itTire;
+          vec2 posTire = tire.getPosition();
+          //calculer la distance entre les 2 centres
+          float dist = std::sqrt( std::pow((pos.x -posTire.x), 2) + std::pow((pos.x -posTire.x), 2));
+          if(dist < DIST_HIT){
+            //increment counter
+            num_ennemis_echapes += 1;
+            std::cout << "---------\nacerto!!!\n-----------\n\n\n";
+            //ennemis.erase(it);
+            //tires.erase(itTire);
+            // ne marche pas, je ne sais pas pouquoi
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          }
+      }
+    }
+
+
+
+
      // afficher le fond
     pos = fond1.getPosition();
     painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond1.pixmap);
@@ -119,31 +148,31 @@ void render_area::paintEvent(QPaintEvent*)
      // afficher les ennemis
     for(auto& ennemi : ennemis){
         pos = ennemi.getPosition();
-	painter.drawPixmap(pos.x,pos.y,TAILLE_ENNEMI_X,TAILLE_ENNEMI_Y,*ennemi.pixmap); 
+	painter.drawPixmap(pos.x,pos.y,TAILLE_ENNEMI_X,TAILLE_ENNEMI_Y,*ennemi.pixmap);
     }
     //afficher les tirs
        for(auto& tire : tires){
         pos = tire.getPosition();
-	painter.drawPixmap(pos.x,pos.y,TAILLE_TIRE_X,TAILLE_TIRE_Y,*tire.pixmap); 
+	painter.drawPixmap(pos.x,pos.y,TAILLE_TIRE_X,TAILLE_TIRE_Y,*tire.pixmap);
     }
-    
+
 }
 
- 
+
 void render_area::keyPressEvent(QKeyEvent *event)
 {
   //std::cout<<"keyPressEvent appelle"<<std::endl;
   vec2 vitesse = vaisseau.getSpeed();
-      
+
   //mouvement horizontal
   if(event->key() == Qt::Key_Left) {
      // std::cout<<"left"<<std::endl;
-	vaisseau.setSpeed(-5, vitesse.y);      
+	vaisseau.setSpeed(-5, vitesse.y);
   }else if(event->key() == Qt::Key_Right) {
       //std::cout<<"right"<<std::endl;
 	vaisseau.setSpeed(5, vitesse.y);
   }
-  
+
   // mouvement vertical
   if(event->key() == Qt::Key_Down) {
       //std::cout<<"down"<<std::endl;
@@ -152,7 +181,7 @@ void render_area::keyPressEvent(QKeyEvent *event)
       //std::cout<<"up"<<std::endl;
 	vaisseau.setSpeed(vitesse.x, -5);
   }
-  
+
   //tire
    if(event->key() == Qt::Key_Space) {
       //std::cout<<"space"<<std::endl;
@@ -185,7 +214,7 @@ void render_area::keyReleaseEvent(QKeyEvent *event)
 	vaisseau.setSpeed(vitesse.x, 0);
     }
 }
- 
+
 
 void render_area::update_timer()
 {
@@ -200,57 +229,17 @@ void render_area::spawn_ennemi()
     Ennemi* nouveauEnnemi = new Ennemi();
     ennemis.push_back(*nouveauEnnemi);
 
-}
-
-
-vec2 render_area::collision_handling(vec2& p)
-{
-    vec2 new_speed=speed;
-
-    //size of the window
-    float const h=height();
-    float const w=width();
-
-    //radius of the sphere
-    float const r=circ.radius;
-
-    //special condition in cases of collision
-    bool collision=false;
-    bool collision_wall=false;
-
-    //collision with the ground
-    if(p.y+r>h)
-    {
-        p.y=h-r;
-        new_speed.y *= -1;
-        collision=true;
+    std::vector<Ennemi>::iterator it;
+    for (it = ennemis.begin(); it != ennemis.end(); it++)
+	  {
+      Ennemi ennemi = *it;
+      vec2 pos = ennemi.getPosition();
+      // ennemis qui ont passe l'ecran
+      if(pos.x <= -100){
+        //destroy the object
+        ennemis.erase(it);
+        //increment counter
+        num_ennemis_echapes += 1;
+      }
     }
-    //collision with the left wall
-    if(p.x-r<0)
-    {
-        p.x=r;
-        new_speed.x *= -1;
-        collision=true;
-        collision_wall=true;
-    }
-    //collision with t      vec2 vitesse = tire.getSpeed();he right wall
-    if(p.x+r>w)
-    {
-        p.x=w-r;
-        new_speed.x *= -1;
-        collision=true;
-        collision_wall=true;
-    }
-    //collision with the top wall
-    if(p.y-r<0)
-    {
-        p.y=r;
-        new_speed.y *= -1;
-        collision=true;
-        collision_wall=true;
-    }
-
-
-    return new_speed;
-
 }

@@ -25,10 +25,9 @@ Ennemi::Ennemi()
     std::uniform_int_distribution<int> uniform_dist(1, 30);
     int rand_int = uniform_dist(e1);
     float rand_float = ((float)rand_int)/35;
-    rand_float = 1;
-    setPosition(14*WINDOW_WIDTH/15, rand_float*(WINDOW_HEIGHT-TAILLE_ENNEMI_Y-5));
+    setPosition(14*WINDOW_WIDTH/15, rand_float*(WINDOW_HEIGHT-TAILLE_ENNEMI_Y-10));
     int speed_y = 1 + (rand_int%3); // entre 1 et 3
-    if (rand_int % 2 == 0)
+    if (rand_int % 2 == 0) //50% de chance de aller par au dessus
     {
       speed_y = -speed_y;
     }
@@ -44,17 +43,17 @@ void Ennemi::move(){
   vec2 pos = this->getPosition();
   vec2 speed = this->getSpeed();
   int x = pos.x;
-  int y = pos.y; 
+  int y = pos.y;
 
  // if(x < -10)
     //destruir ennemi !!!!!!!!!!!!!!!!
   if((y+TAILLE_ENNEMI_Y) >= (WINDOW_HEIGHT) || y <= 0){
     setSpeed(getSpeed().x,-getSpeed().y);
   }
-  
+
   speed = this->getSpeed();
   x = (int) pos.x+speed.x;
-  y = (int) pos.y+speed.y; 
-  
+  y = (int) pos.y+speed.y;
+
   this->setPosition(x, y);
 }

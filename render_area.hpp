@@ -37,7 +37,7 @@ public:
 
     /** Draw or not the circle when called */
     void change_draw_circle_state();
-    
+
 
 protected:
     /** Actual drawing function */
@@ -49,7 +49,7 @@ protected:
 private slots:
 
     /** Function called periodically at constant time interval by a timer */
-    void update_timer(); 
+    void update_timer();
     void spawn_ennemi();
 
 
@@ -66,9 +66,9 @@ private: //functions
 
 private: //attributes
 
-    /** The circle */
-    circle circ;
-    
+    //nombre d'ennemis echapes
+    int num_ennemis_echapes;
+
     // fond
     Objet_bougeant fond1;
     Objet_bougeant fond2;
