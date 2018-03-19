@@ -9,8 +9,8 @@
 #include <QKeyEvent>
 
 
-#define WINDOW_WIDTH 852
-#define WINDOW_HEIGHT 676
+#define WINDOW_WIDTH 821
+#define WINDOW_HEIGHT 541
 #define NUM_VIES_INITIAL 3
 
 

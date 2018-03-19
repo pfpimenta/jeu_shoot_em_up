@@ -8,8 +8,8 @@
 #include "Tire.hpp"
 
 
-#define WINDOW_WIDTH 852
-#define WINDOW_HEIGHT 676
+#define WINDOW_WIDTH 821
+#define WINDOW_HEIGHT 541
 
 #define TIRE_SPEED 10
 

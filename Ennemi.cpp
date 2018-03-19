@@ -8,15 +8,31 @@
 #include "Ennemi.hpp"
 
 
-#define WINDOW_WIDTH 852
-#define WINDOW_HEIGHT 676
+#define WINDOW_WIDTH 821
+#define WINDOW_HEIGHT 541
+
+#define TAILLE_ENNEMI_X 80
+#define TAILLE_ENNEMI_Y 60
+
 
 Ennemi::Ennemi()
 {
     std::cout<<"Constructor of Ennemi is called"<<std::endl;
     pixmap->load("images/alien.png");
-    setPosition(WINDOW_WIDTH, WINDOW_HEIGHT/2);
-    setSpeed(-1, 0);
+    // prendre un nombre aleatoire entre 0 et 1
+    std::random_device r;
+    std::default_random_engine e1(r());
+    std::uniform_int_distribution<int> uniform_dist(1, 30);
+    int rand_int = uniform_dist(e1);
+    float rand_float = ((float)rand_int)/35;
+    rand_float = 1;
+    setPosition(14*WINDOW_WIDTH/15, rand_float*(WINDOW_HEIGHT-TAILLE_ENNEMI_Y-5));
+    int speed_y = 1 + (rand_int%3); // entre 1 et 3
+    if (rand_int % 2 == 0)
+    {
+      speed_y = -speed_y;
+    }
+    setSpeed(-1, speed_y);
 }
 
 Ennemi::~Ennemi()
@@ -27,16 +43,16 @@ Ennemi::~Ennemi()
 void Ennemi::move(){
   vec2 pos = this->getPosition();
   vec2 speed = this->getSpeed();
-  int x =  pos.x;
-  int y =  pos.y; 
+  int x = pos.x;
+  int y = pos.y; 
 
-  if(x < -10)
+ // if(x < -10)
     //destruir ennemi !!!!!!!!!!!!!!!!
-    setSpeed(-getSpeed().x, speed.y);
-  if(y > 440 )
+  if((y+TAILLE_ENNEMI_Y) >= (WINDOW_HEIGHT) || y <= 0){
     setSpeed(getSpeed().x,-getSpeed().y);
-  if(y < 0)
-    setSpeed(getSpeed().x,-getSpeed().y);
+  }
+  
+  speed = this->getSpeed();
   x = (int) pos.x+speed.x;
   y = (int) pos.y+speed.y; 
   

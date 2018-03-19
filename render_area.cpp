@@ -15,17 +15,17 @@
 #include <cassert>
 
 
-#define WINDOW_WIDTH 852
-#define WINDOW_HEIGHT 676
+#define WINDOW_WIDTH 821
+#define WINDOW_HEIGHT 541
 
 #define TAILLE_VAISSEAU_X 180
 #define TAILLE_VAISSEAU_Y 100
 
-#define TAILLE_ENNEMI_X 100
-#define TAILLE_ENNEMI_Y 75
+#define TAILLE_ENNEMI_X 80
+#define TAILLE_ENNEMI_Y 60
 
-#define TAILLE_TIRE_X 25
-#define TAILLE_TIRE_Y 25
+#define TAILLE_TIRE_X 20
+#define TAILLE_TIRE_Y 18
 
 
 render_area::render_area(QWidget *parent)
@@ -56,7 +56,7 @@ render_area::render_area(QWidget *parent)
    
    fond1.setSpeed(-1,0);
    fond2.setSpeed(-1,0);
-   fond2.setPosition(852,0);
+   fond2.setPosition(WINDOW_WIDTH,0);
    
    // ennemi
    Ennemi* testEnnemi = new Ennemi();
@@ -133,43 +133,29 @@ void render_area::paintEvent(QPaintEvent*)
 void render_area::keyPressEvent(QKeyEvent *event)
 {
   //std::cout<<"keyPressEvent appelle"<<std::endl;
-  
-  if(event->key() == Qt::Key_Left) {
-      std::cout<<"left"<<std::endl;
-      vec2 vitesse = vaisseau.getSpeed();
-      if(vitesse.x <= -5){
-	vaisseau.setSpeed(-5, vitesse.y);
-      }else{
-	vaisseau.setSpeed(vitesse.x-2, vitesse.y);
-      }
+  vec2 vitesse = vaisseau.getSpeed();
       
+  //mouvement horizontal
+  if(event->key() == Qt::Key_Left) {
+     // std::cout<<"left"<<std::endl;
+	vaisseau.setSpeed(-5, vitesse.y);      
   }else if(event->key() == Qt::Key_Right) {
-      std::cout<<"right"<<std::endl;
-      vec2 vitesse = vaisseau.getSpeed();
-      if(vitesse.x >= 5){
+      //std::cout<<"right"<<std::endl;
 	vaisseau.setSpeed(5, vitesse.y);
-      }else{
-	vaisseau.setSpeed(vitesse.x+2, vitesse.y);
-      }
-  }else if(event->key() == Qt::Key_Down) {
-      std::cout<<"down"<<std::endl;
-      vec2 vitesse = vaisseau.getSpeed();
-      if(vitesse.y >= 5){
-	vaisseau.setSpeed(vitesse.x, 5);
-      }else{
-	vaisseau.setSpeed(vitesse.x, vitesse.y+2);
-      }
-  }else if(event->key() == Qt::Key_Up) {
-      std::cout<<"up"<<std::endl;
-      vec2 vitesse = vaisseau.getSpeed();
-      if(vitesse.y <= -5){
-	vaisseau.setSpeed(vitesse.x, -5);
-      }else{
-	vaisseau.setSpeed(vitesse.x, vitesse.y-2);
-      }
   }
+  
+  // mouvement vertical
+  if(event->key() == Qt::Key_Down) {
+      //std::cout<<"down"<<std::endl;
+      vaisseau.setSpeed(vitesse.x, 5);
+  }else if(event->key() == Qt::Key_Up) {
+      //std::cout<<"up"<<std::endl;
+	vaisseau.setSpeed(vitesse.x, -5);
+  }
+  
+  //tire
    if(event->key() == Qt::Key_Space) {
-      std::cout<<"space"<<std::endl;
+      //std::cout<<"space"<<std::endl;
       vec2 pos = vaisseau.getPosition();
       Tire* tire=new Tire(pos.x + TAILLE_VAISSEAU_X/2, pos.y + TAILLE_VAISSEAU_Y/2);
       tires.push_back(*tire);
@@ -182,19 +168,19 @@ void render_area::keyReleaseEvent(QKeyEvent *event)
     if(event->isAutoRepeat())
       return;
     if(event->key() == Qt::Key_Left) {
-	std::cout<<"left off"<<std::endl;
+	//std::cout<<"left off"<<std::endl;
 	vec2 vitesse = vaisseau.getSpeed();
 	vaisseau.setSpeed(0, vitesse.y);
     }else if(event->key() == Qt::Key_Right) {
-	std::cout<<"right off"<<std::endl;
+	//std::cout<<"right off"<<std::endl;
 	vec2 vitesse = vaisseau.getSpeed();
 	vaisseau.setSpeed(0, vitesse.y);
     }else if(event->key() == Qt::Key_Down) {
-	std::cout<<"down off"<<std::endl;
+	//std::cout<<"down off"<<std::endl;
 	vec2 vitesse = vaisseau.getSpeed();
 	vaisseau.setSpeed(vitesse.x, 0);
     }else if(event->key() == Qt::Key_Up) {
-	std::cout<<"up off"<<std::endl;
+	//std::cout<<"up off"<<std::endl;
 	vec2 vitesse = vaisseau.getSpeed();
 	vaisseau.setSpeed(vitesse.x, 0);
     }
@@ -210,7 +196,7 @@ void render_area::update_timer()
 void render_area::spawn_ennemi()
 {
     //called periodically
-    std::cout<<"spawn ennemi"<<std::endl;
+    //std::cout<<"spawn ennemi"<<std::endl;
     Ennemi* nouveauEnnemi = new Ennemi();
     ennemis.push_back(*nouveauEnnemi);
 
