@@ -23,12 +23,21 @@ void Objet_bougeant::setPosition(int x, int y){
   this->position = vec2(x,y);
 }
 
+void Objet_bougeant::setPosition(vec2 newPos){
+  this->position = newPos;
+}
+
 vec2 	Objet_bougeant::getPosition(){
   return this->position;
 }
 
 void Objet_bougeant::setSpeed(int x, int y){
   this->speed = vec2(x,y);
+}
+
+
+void Objet_bougeant::setSpeed(vec2 newSpeed){
+  this->speed = newSpeed;
 }
 
 vec2 Objet_bougeant::getSpeed(){
@@ -39,9 +48,3 @@ vec2 Objet_bougeant::getSpeed(){
 void Objet_bougeant::move(){
   this->position = vec2(this->position.x+this->speed.x, this->position.y+this->speed.y);
 }
-
-void loadImage(std::string img_path){
-  // loads the sprite of the objet
-  //this->pixmap
-}
-

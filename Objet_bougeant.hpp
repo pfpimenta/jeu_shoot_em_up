@@ -22,11 +22,12 @@ public:
     Objet_bougeant();
     ~Objet_bougeant();
     void setPosition(int x, int y);
+    void setPosition(vec2 newPos);
     vec2 getPosition();
     void setSpeed(int x, int y);
+    void setSpeed(vec2 newSpeed);
     vec2 getSpeed();
     void move();
-    void loadImage(std::string img_path);
     QPixmap *pixmap; // l'image
 
 private:

@@ -17,11 +17,12 @@ class Tire : public Objet_bougeant
   
 public:
     Tire();
+    Tire(int x, int y);
     ~Tire();
 
 
 private:
-
+  
   
 };
 

@@ -27,7 +27,7 @@ LDFLAGS=-pthread ${QT_DEPENDENCIES}
 CXX=g++
 
 
-main: main.o window.o moc_window.o render_area.o moc_render_area.o vec2.o circle.o Objet_bougeant.o Navette.o Vaisseau.o Ennemi.o
+main: main.o window.o moc_window.o render_area.o moc_render_area.o vec2.o circle.o Objet_bougeant.o Navette.o Vaisseau.o Ennemi.o Tire.o
 	${CXX} $^ -o shoot_em_up ${LDFLAGS}
 
 main.o: main.cpp window.hpp
@@ -47,6 +47,7 @@ Objet_bougeant.o: Objet_bougeant.cpp Objet_bougeant.hpp vec2.hpp
 Navette.o: Navette.cpp Navette.hpp vec2.hpp
 Vaisseau.o: Vaisseau.cpp Vaisseau.hpp vec2.hpp
 Ennemi.o: Ennemi.cpp Ennemi.hpp vec2.hpp
+Tire.o: Tire.cpp Tire.hpp vec2.hpp
 
 ui_mainwindow.h: mainwindow.ui
 	${UIC} $< -o $@

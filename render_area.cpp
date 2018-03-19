@@ -18,6 +18,15 @@
 #define WINDOW_WIDTH 852
 #define WINDOW_HEIGHT 676
 
+#define TAILLE_VAISSEAU_X 180
+#define TAILLE_VAISSEAU_Y 100
+
+#define TAILLE_ENNEMI_X 100
+#define TAILLE_ENNEMI_Y 75
+
+#define TAILLE_TIRE_X 25
+#define TAILLE_TIRE_Y 25
+
 
 render_area::render_area(QWidget *parent)
     :QWidget(parent),
@@ -28,7 +37,7 @@ render_area::render_area(QWidget *parent)
       speed(0.0f,0.0f),
       dt(1/5.0f),
       timer(),
-      //ennemiTimer(),
+      ennemiTimer(),
       time()
 {
     setBackgroundRole(QPalette::Base);
@@ -38,8 +47,8 @@ render_area::render_area(QWidget *parent)
     connect(&timer, SIGNAL(timeout()), this, SLOT(update_timer()));
     timer.start(30); //every 30ms
     //timer calling the function update_timer periodicaly
-    //connect(&ennemiTimer, SIGNAL(timeout()), this, SLOT(spawn_ennemi()));
-    //ennemiTimer.start(5000); //every 5000ms=5s
+    connect(&ennemiTimer, SIGNAL(timeout()), this, SLOT(spawn_ennemi()));
+    ennemiTimer.start(5000); //every 5000ms=5s
       
    //fond loadImage
    fond1.pixmap->load("images/background.png");
@@ -84,13 +93,19 @@ void render_area::paintEvent(QPaintEvent*)
     pos = fond2.getPosition();
     if(pos.x == -WINDOW_WIDTH)
       fond2.setPosition(WINDOW_WIDTH, pos.y);
-    // movement des objets     
+    // movement des ennemis     
     for(auto& ennemi : ennemis){
         pos = ennemi.getPosition();
 	ennemi.move();
     }
     // movement de la vaisseau     
     vaisseau.move();
+    // movement des tires
+        for(auto& tire : tires){
+        pos = tire.getPosition();
+	tire.move();
+    }
+
 
     
      // afficher le fond
@@ -100,13 +115,18 @@ void render_area::paintEvent(QPaintEvent*)
     painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond2.pixmap);
      // afficher le vaisseau
     pos = vaisseau.getPosition();
-        std::cout<<"position : " << pos<<std::endl;
-    painter.drawPixmap(pos.x,pos.y,180,100,*vaisseau.pixmap);
+    painter.drawPixmap(pos.x,pos.y,TAILLE_VAISSEAU_X,TAILLE_VAISSEAU_Y,*vaisseau.pixmap);
      // afficher les ennemis
     for(auto& ennemi : ennemis){
         pos = ennemi.getPosition();
-	painter.drawPixmap(pos.x,pos.y,100,75,*ennemi.pixmap); 
+	painter.drawPixmap(pos.x,pos.y,TAILLE_ENNEMI_X,TAILLE_ENNEMI_Y,*ennemi.pixmap); 
     }
+    //afficher les tirs
+       for(auto& tire : tires){
+        pos = tire.getPosition();
+	painter.drawPixmap(pos.x,pos.y,TAILLE_TIRE_X,TAILLE_TIRE_Y,*tire.pixmap); 
+    }
+    
 }
 
  
@@ -148,6 +168,13 @@ void render_area::keyPressEvent(QKeyEvent *event)
 	vaisseau.setSpeed(vitesse.x, vitesse.y-2);
       }
   }
+   if(event->key() == Qt::Key_Space) {
+      std::cout<<"space"<<std::endl;
+      vec2 pos = vaisseau.getPosition();
+      Tire* tire=new Tire(pos.x + TAILLE_VAISSEAU_X/2, pos.y + TAILLE_VAISSEAU_Y/2);
+      tires.push_back(*tire);
+  }
+
 }
 
 void render_area::keyReleaseEvent(QKeyEvent *event)
@@ -184,6 +211,9 @@ void render_area::spawn_ennemi()
 {
     //called periodically
     std::cout<<"spawn ennemi"<<std::endl;
+    Ennemi* nouveauEnnemi = new Ennemi();
+    ennemis.push_back(*nouveauEnnemi);
+
 }
 
 
@@ -217,7 +247,7 @@ vec2 render_area::collision_handling(vec2& p)
         collision=true;
         collision_wall=true;
     }
-    //collision with the right wall
+    //collision with t      vec2 vitesse = tire.getSpeed();he right wall
     if(p.x+r>w)
     {
         p.x=w-r;

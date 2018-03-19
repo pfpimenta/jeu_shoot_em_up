@@ -18,6 +18,7 @@ class Ennemi : public Navette
 public:
     Ennemi();
     ~Ennemi();
+    void move();
 
 
 private:

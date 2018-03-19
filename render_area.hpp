@@ -19,7 +19,8 @@
 
 #include "Vaisseau.hpp"
 #include "Ennemi.hpp"
- 
+#include "Tire.hpp"
+
 
 //forward declaration of QLabel
 class QLabel;
@@ -76,6 +77,8 @@ private: //attributes
     Vaisseau vaisseau;
     /** The vaisseau */
     std::vector<Ennemi> ennemis;
+    std::vector<Tire> tires;
+
     /** The speed of the circle */
     vec2 speed;
     /** The time integration step */
