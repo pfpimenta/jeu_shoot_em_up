@@ -42,8 +42,8 @@ render_area::render_area(QWidget *parent)
     //ennemiTimer.start(5000); //every 5000ms=5s
       
    //fond loadImage
-   fond1.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/jeu_shoot_em_up/images/background.png");
-   fond2.pixmap->load("/fs03/share/users/p.foletto-pimenta/home/jeu_shoot_em_up/images/background.png");
+   fond1.pixmap->load("images/background.png");
+   fond2.pixmap->load("images/background.png");
    
    fond1.setSpeed(-1,0);
    fond2.setSpeed(-1,0);
@@ -100,6 +100,7 @@ void render_area::paintEvent(QPaintEvent*)
     painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond2.pixmap);
      // afficher le vaisseau
     pos = vaisseau.getPosition();
+        std::cout<<"position : " << pos<<std::endl;
     painter.drawPixmap(pos.x,pos.y,180,100,*vaisseau.pixmap);
      // afficher les ennemis
     for(auto& ennemi : ennemis){
@@ -115,40 +116,36 @@ void render_area::keyPressEvent(QKeyEvent *event)
   
   if(event->key() == Qt::Key_Left) {
       std::cout<<"left"<<std::endl;
-      vaisseau.moveLeftToggle(true);
       vec2 vitesse = vaisseau.getSpeed();
-      if(vitesse.x <= -4){
-	vaisseau.setSpeed(vitesse.x, vitesse.y);
+      if(vitesse.x <= -5){
+	vaisseau.setSpeed(-5, vitesse.y);
       }else{
-	vaisseau.setSpeed(vitesse.x-1, vitesse.y);
+	vaisseau.setSpeed(vitesse.x-2, vitesse.y);
       }
       
   }else if(event->key() == Qt::Key_Right) {
       std::cout<<"right"<<std::endl;
-      vaisseau.moveRightToggle(true);
       vec2 vitesse = vaisseau.getSpeed();
-      if(vitesse.x >= 4){
-	vaisseau.setSpeed(vitesse.x, vitesse.y);
+      if(vitesse.x >= 5){
+	vaisseau.setSpeed(5, vitesse.y);
       }else{
-	vaisseau.setSpeed(vitesse.x+1, vitesse.y);
+	vaisseau.setSpeed(vitesse.x+2, vitesse.y);
       }
   }else if(event->key() == Qt::Key_Down) {
       std::cout<<"down"<<std::endl;
-      vaisseau.moveDownToggle(true);
       vec2 vitesse = vaisseau.getSpeed();
-      if(vitesse.y >= 4){
-	vaisseau.setSpeed(vitesse.x, vitesse.y);
+      if(vitesse.y >= 5){
+	vaisseau.setSpeed(vitesse.x, 5);
       }else{
-	vaisseau.setSpeed(vitesse.x, vitesse.y+1);
+	vaisseau.setSpeed(vitesse.x, vitesse.y+2);
       }
   }else if(event->key() == Qt::Key_Up) {
       std::cout<<"up"<<std::endl;
-      vaisseau.moveUpToggle(true);
       vec2 vitesse = vaisseau.getSpeed();
-      if(vitesse.y <= -4){
-	vaisseau.setSpeed(vitesse.x, vitesse.y);
+      if(vitesse.y <= -5){
+	vaisseau.setSpeed(vitesse.x, -5);
       }else{
-	vaisseau.setSpeed(vitesse.x, vitesse.y-1);
+	vaisseau.setSpeed(vitesse.x, vitesse.y-2);
       }
   }
 }
@@ -159,22 +156,18 @@ void render_area::keyReleaseEvent(QKeyEvent *event)
       return;
     if(event->key() == Qt::Key_Left) {
 	std::cout<<"left off"<<std::endl;
-	vaisseau.moveLeftToggle(false);
 	vec2 vitesse = vaisseau.getSpeed();
 	vaisseau.setSpeed(0, vitesse.y);
     }else if(event->key() == Qt::Key_Right) {
 	std::cout<<"right off"<<std::endl;
-	vaisseau.moveRightToggle(false);
 	vec2 vitesse = vaisseau.getSpeed();
 	vaisseau.setSpeed(0, vitesse.y);
     }else if(event->key() == Qt::Key_Down) {
 	std::cout<<"down off"<<std::endl;
-	vaisseau.moveDownToggle(false);
 	vec2 vitesse = vaisseau.getSpeed();
 	vaisseau.setSpeed(vitesse.x, 0);
     }else if(event->key() == Qt::Key_Up) {
 	std::cout<<"up off"<<std::endl;
-	vaisseau.moveUpToggle(false);
 	vec2 vitesse = vaisseau.getSpeed();
 	vaisseau.setSpeed(vitesse.x, 0);
     }

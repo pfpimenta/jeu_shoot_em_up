@@ -5,21 +5,21 @@
 
 //includes
 
-#include "Ennemi.hpp"
+#include "Tire.hpp"
 
 
 #define WINDOW_WIDTH 852
 #define WINDOW_HEIGHT 676
 
-Ennemi::Ennemi()
+Tire::Tire()
 {
-    std::cout<<"Constructor of Ennemi is called"<<std::endl;
-    pixmap->load("images/alien.png");
+    std::cout<<"Constructor of Tire is called"<<std::endl;
+    pixmap->load("images/tire.png");
     setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
     setSpeed(-1, 0);
 }
 
-Ennemi::~Ennemi()
+Tire::~Tire()
 {
-    std::cout<<"Destructor of Ennemi is called"<<std::endl;
+    std::cout<<"Destructor of Tire is called"<<std::endl;
 }

@@ -16,23 +16,14 @@ class Vaisseau : public Navette
 {
   
 public:
-
     Vaisseau();
     ~Vaisseau();
-    void setPosition(int x, int y);
+    //void setPosition(int x, int y);
+    void move();
     void debugFonction();
-    void moveUpToggle(bool move);
-    void moveDownToggle(bool move);
-    void moveRightToggle(bool move);
-    void moveLeftToggle(bool move);
 
 private:
-  vec2 position;
-  vec2 speed;
-  bool moveUp;
-  bool moveDown;
-  bool moveRight;
-  bool moveLeft;
+  int num_vies;
 };
 
 
