@@ -55,6 +55,10 @@ private slots:
 
 private: //functions
 
+    // traitement de colisions entre les objects (vaisseau, ennemis, tires,...)
+    void collisions();
+    //mouvement des objects (vaisseau, ennemis, tires,...)
+    void mouvement();
     /** Insert current position and time inside the recording structures */
     void store_values(vec2 const& click);
 
@@ -68,6 +72,8 @@ private: //attributes
 
     //nombre d'ennemis echapes
     int num_ennemis_echapes;
+    //nombre d'ennemis tues
+    int num_ennemis_tues;
 
     // fond
     Objet_bougeant fond1;
@@ -75,8 +81,8 @@ private: //attributes
     /** The vaisseau */
     Vaisseau vaisseau;
     /** The vaisseau */
-    std::vector<Ennemi> ennemis;
-    std::vector<Tire> tires;
+    std::vector<Ennemi*> ennemis;
+    std::vector<Tire*> tires;
 
     /** The speed of the circle */
     vec2 speed;

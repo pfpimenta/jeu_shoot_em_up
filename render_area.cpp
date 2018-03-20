@@ -27,7 +27,7 @@
 #define TAILLE_TIRE_X 20
 #define TAILLE_TIRE_Y 18
 
-#define DIST_HIT 200 //''hitbox''
+#define DIST_HIT 30 //''hitbox''
 
 render_area::render_area(QWidget *parent)
           :QWidget(parent),
@@ -63,7 +63,7 @@ render_area::render_area(QWidget *parent)
 
    // ennemi
    //Ennemi* testEnnemi = new Ennemi();
-   //ennemis.push_back(*testEnnemi);
+   //ennemis.push_back(testEnnemi);
 
 }
 
@@ -87,58 +87,10 @@ void render_area::paintEvent(QPaintEvent*)
     brush.setStyle(Qt::SolidPattern);
     painter.setBrush(brush);
 
-    // movement du fond
-    fond1.move();
-    vec2 pos = fond1.getPosition();
-    if(pos.x == -WINDOW_WIDTH)
-      fond1.setPosition(WINDOW_WIDTH, pos.y);
-    fond2.move();
-    pos = fond2.getPosition();
-    if(pos.x == -WINDOW_WIDTH)
-      fond2.setPosition(WINDOW_WIDTH, pos.y);
-    // movement des ennemis
-    for(auto& ennemi : ennemis){
-        pos = ennemi.getPosition();
-	ennemi.move();
-    }
-    // movement de la vaisseau
-    vaisseau.move();
-    // movement des tires
-        for(auto& tire : tires){
-        pos = tire.getPosition();
-	tire.move();
-    }
-
-
-    std::vector<Ennemi>::iterator it;
-    for (it = ennemis.begin(); it != ennemis.end(); it++)
-    {
-      Ennemi ennemi = *it;
-      vec2 pos = ennemi.getPosition();
-      //ennemis qui ont ete frappe par un tire
-      std::vector<Tire>::iterator itTire;
-      for(itTire = tires.begin(); itTire != tires.end(); itTire++){
-          Tire tire = *itTire;
-          vec2 posTire = tire.getPosition();
-          //calculer la distance entre les 2 centres
-          float dist = std::sqrt( std::pow((pos.x -posTire.x), 2) + std::pow((pos.x -posTire.x), 2));
-          if(dist < DIST_HIT){
-            //increment counter
-            num_ennemis_echapes += 1;
-            std::cout << "---------\nacerto!!!\n-----------\n\n\n";
-            //ennemis.erase(it);
-            //tires.erase(itTire);
-            // ne marche pas, je ne sais pas pouquoi
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          }
-      }
-    }
-
-
 
 
      // afficher le fond
-    pos = fond1.getPosition();
+    vec2 pos = fond1.getPosition();
     painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond1.pixmap);
     pos = fond2.getPosition();
     painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond2.pixmap);
@@ -147,17 +99,78 @@ void render_area::paintEvent(QPaintEvent*)
     painter.drawPixmap(pos.x,pos.y,TAILLE_VAISSEAU_X,TAILLE_VAISSEAU_Y,*vaisseau.pixmap);
      // afficher les ennemis
     for(auto& ennemi : ennemis){
-        pos = ennemi.getPosition();
-	painter.drawPixmap(pos.x,pos.y,TAILLE_ENNEMI_X,TAILLE_ENNEMI_Y,*ennemi.pixmap);
+        pos = ennemi->getPosition();
+	      painter.drawPixmap(pos.x,pos.y,TAILLE_ENNEMI_X,TAILLE_ENNEMI_Y,*ennemi->pixmap);
     }
     //afficher les tirs
-       for(auto& tire : tires){
-        pos = tire.getPosition();
-	painter.drawPixmap(pos.x,pos.y,TAILLE_TIRE_X,TAILLE_TIRE_Y,*tire.pixmap);
+    for(auto& tire : tires){
+        pos = tire->getPosition();
+	      painter.drawPixmap(pos.x,pos.y,TAILLE_TIRE_X,TAILLE_TIRE_Y,*tire->pixmap);
     }
 
 }
 
+void render_area::mouvement(){
+  // movement du fond
+  fond1.move();
+  vec2 pos = fond1.getPosition();
+  if(pos.x == -WINDOW_WIDTH)
+    fond1.setPosition(WINDOW_WIDTH, pos.y);
+  fond2.move();
+  pos = fond2.getPosition();
+  if(pos.x == -WINDOW_WIDTH)
+    fond2.setPosition(WINDOW_WIDTH, pos.y);
+  // movement des ennemis
+  for(auto& ennemi : ennemis){
+        pos = ennemi->getPosition();
+        ennemi->move();
+  }
+  // movement de la vaisseau
+  vaisseau.move();
+  // movement des tires
+  for(auto& tire : tires){
+      pos = tire->getPosition();
+      tire->move();
+  }
+}
+
+void render_area::collisions(){
+  std::vector<Ennemi*>::iterator it;
+  for (it = ennemis.begin(); it != ennemis.end();it++)
+  {
+    Ennemi* ennemi = *it;
+    vec2 pos = ennemi->getPosition();
+    float ennemi_x_center = pos.x + (TAILLE_ENNEMI_X/2);
+    float ennemi_y_center = pos.y + (TAILLE_ENNEMI_Y/2);
+
+    //ennemis qui ont ete frappe par un tire
+    std::vector<Tire*>::iterator itTire;
+    for(itTire = tires.begin(); itTire != tires.end(); ){
+        Tire* tire = *itTire;
+        vec2 posTire = tire->getPosition();
+        float tire_x_center = posTire.x + (TAILLE_TIRE_X/2);
+        float tire_y_center = posTire.y + (TAILLE_TIRE_Y/2);
+        //calculer la distance entre les 2 centres
+        float dist = std::sqrt( std::pow((ennemi_x_center -tire_x_center), 2) + std::pow((ennemi_y_center -tire_y_center), 2));
+        float dist_x = std::pow((ennemi_x_center -tire_x_center), 2);
+        float dist_y = std::pow((ennemi_y_center -tire_y_center), 2);
+        if(dist < DIST_HIT){
+          //increment counter
+          num_ennemis_tues += 1;
+          std::cout << "---------\n woooohoooo!!! HIT!!!\n-----------\n\n\n";
+          std::cout << "dist:"<<dist<<" dist x: "<<dist_x<<" dist y: "<<dist_y<<"\n";
+          //ennemi.~Ennemi();
+          //delete *tire;
+          //it = ennemis.erase(it);
+          itTire = tires.erase(itTire);
+          // ne marche pas, je ne sais pas pouquoi
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }else{
+          itTire++;
+        }
+    }
+  }
+}
 
 void render_area::keyPressEvent(QKeyEvent *event)
 {
@@ -187,7 +200,7 @@ void render_area::keyPressEvent(QKeyEvent *event)
       //std::cout<<"space"<<std::endl;
       vec2 pos = vaisseau.getPosition();
       Tire* tire=new Tire(pos.x + TAILLE_VAISSEAU_X/2, pos.y + TAILLE_VAISSEAU_Y/2);
-      tires.push_back(*tire);
+      tires.push_back(tire);
   }
 
 }
@@ -218,28 +231,52 @@ void render_area::keyReleaseEvent(QKeyEvent *event)
 
 void render_area::update_timer()
 {
-    //called periodically
-    repaint();
+    //called periodically (every 30ms)
+    collisions(); // traiter les colisions
+    mouvement(); // mouvement des objects
+    repaint(); // affichage des objects
 }
 
 void render_area::spawn_ennemi()
 {
-    //called periodically
-    //std::cout<<"spawn ennemi"<<std::endl;
+    //called periodically (every 5s)
     Ennemi* nouveauEnnemi = new Ennemi();
-    ennemis.push_back(*nouveauEnnemi);
+    ennemis.push_back(nouveauEnnemi);
+    std::cout<<"spawn ennemi!! \nnum ennemis :"<< ennemis.size() <<std::endl;
+    std::cout<<"num tires :"<< tires.size() <<std::endl;
 
-    std::vector<Ennemi>::iterator it;
-    for (it = ennemis.begin(); it != ennemis.end(); it++)
+
+    std::vector<Ennemi*>::iterator it;
+    for (it = ennemis.begin(); it != ennemis.end(); )
 	  {
-      Ennemi ennemi = *it;
-      vec2 pos = ennemi.getPosition();
+      Ennemi* ennemi = *it;
+      vec2 pos = ennemi->getPosition();
       // ennemis qui ont passe l'ecran
       if(pos.x <= -100){
         //destroy the object
-        ennemis.erase(it);
+        it = ennemis.erase(it);
         //increment counter
         num_ennemis_echapes += 1;
+      }else{
+        it++;
       }
     }
+
+
+    std::vector<Tire*>::iterator itTire;
+    for (itTire = tires.begin(); itTire != tires.end(); )
+	  {
+      Tire* tire = *itTire;
+      vec2 pos = tire->getPosition();
+      // ennemis qui ont passe l'ecran
+      if(pos.x >= WINDOW_WIDTH + 200){
+        //destroy the object
+        std::cout<<"TIRE LOIN!! \nnum tires :"<< tires.size() <<std::endl;
+        std::cout<<"tire position : "<< tire->getPosition() <<std::endl;
+        itTire = tires.erase(itTire);
+      }else{
+        itTire++;
+      }
+    }
+
 }
