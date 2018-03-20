@@ -136,9 +136,10 @@ void render_area::mouvement(){
 
 void render_area::collisions(){
   std::vector<Ennemi*>::iterator it;
-  for (it = ennemis.begin(); it != ennemis.end();it++)
+  for (it = ennemis.begin(); it != ennemis.end();)
   {
     Ennemi* ennemi = *it;
+    bool ennemiFrappe = false;
     vec2 pos = ennemi->getPosition();
     float ennemi_x_center = pos.x + (TAILLE_ENNEMI_X/2);
     float ennemi_y_center = pos.y + (TAILLE_ENNEMI_Y/2);
@@ -159,15 +160,16 @@ void render_area::collisions(){
           num_ennemis_tues += 1;
           std::cout << "---------\n woooohoooo!!! HIT!!!\n-----------\n\n\n";
           std::cout << "dist:"<<dist<<" dist x: "<<dist_x<<" dist y: "<<dist_y<<"\n";
-          //ennemi.~Ennemi();
-          //delete *tire;
-          //it = ennemis.erase(it);
+          // destruir ennemi et tire
+          it = ennemis.erase(it);
           itTire = tires.erase(itTire);
-          // ne marche pas, je ne sais pas pouquoi
-          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          ennemiFrappe = true;
         }else{
           itTire++;
         }
+    }
+    if (ennemiFrappe == false) {
+      it++;
     }
   }
 }
