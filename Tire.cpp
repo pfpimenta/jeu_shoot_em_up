@@ -11,7 +11,7 @@
 #define WINDOW_WIDTH 821
 #define WINDOW_HEIGHT 541
 
-#define TIRE_SPEED 10
+#define TIRE_SPEED 15
 
 Tire::Tire()
 {
@@ -33,4 +33,3 @@ Tire::~Tire()
 {
     std::cout<<"Destructor of Tire is called"<<std::endl;
 }
-

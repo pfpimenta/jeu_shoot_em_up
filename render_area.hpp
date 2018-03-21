@@ -35,8 +35,8 @@ public:
     render_area(QWidget *parent = 0);
     ~render_area();
 
-    /** Draw or not the circle when called */
-    void change_draw_circle_state();
+    // start game : start spawning of ennemis
+    void start_game();
 
 
 protected:
@@ -70,6 +70,8 @@ private: //functions
 
 private: //attributes
 
+    // flag for game started
+    bool isGameStarted;
     //nombre d'ennemis echapes
     int num_ennemis_echapes;
     //nombre d'ennemis tues

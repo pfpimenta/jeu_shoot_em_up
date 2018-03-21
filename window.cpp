@@ -34,7 +34,6 @@ void window::action_quit()
 
 void window::action_start()
 {
-    //render->change_draw_circle_state();
+    std::cout << "\n\n\n" << "LE JEU A COMMENCE!" << "\n\n\n";
+    render->start_game();
 }
-
-

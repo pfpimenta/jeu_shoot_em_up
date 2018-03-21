@@ -34,9 +34,9 @@ void Vaisseau::debugFonction(){
 }
 
 void Vaisseau::move(){
- 
+
   int x = (int) this->getPosition().x+this->getSpeed().x;
-  int y = (int) this->getPosition().y+this->getSpeed().y; 
+  int y = (int) this->getPosition().y+this->getSpeed().y;
   if(x > 645 )
     x = 645;
   if(x < 0)
