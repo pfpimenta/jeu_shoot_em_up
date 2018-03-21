@@ -17,6 +17,7 @@ window::window(QWidget *parent)
     ui->setupUi(this);
     ui->layout_scene->addWidget(render);
     render->setFocus();
+    render->setUi(ui);
 
     //Connection with signals
     connect(ui->quit,SIGNAL(clicked()),this,SLOT(action_quit()));

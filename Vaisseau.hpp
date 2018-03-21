@@ -20,6 +20,8 @@ public:
     ~Vaisseau();
     //void setPosition(int x, int y);
     void move();
+    void perdreUneVie();
+    int  getNumVies();
     void debugFonction();
 
 private:

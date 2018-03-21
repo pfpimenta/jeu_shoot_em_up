@@ -17,6 +17,7 @@
 #include <list>
 #include <vector>
 
+#include "ui_mainwindow.h"
 #include "Vaisseau.hpp"
 #include "Ennemi.hpp"
 #include "Tire.hpp"
@@ -37,6 +38,8 @@ public:
 
     // start game : start spawning of ennemis
     void start_game();
+    
+    void setUi(Ui::MainWindow *ui);
 
 
 protected:
@@ -50,6 +53,7 @@ private slots:
 
     /** Function called periodically at constant time interval by a timer */
     void update_timer();
+    void enable_shot();
     void spawn_ennemi();
 
 
@@ -72,6 +76,8 @@ private: //attributes
 
     // flag for game started
     bool isGameStarted;
+    // flag for being able to shot
+    bool onPeutTirer;
     //nombre d'ennemis echapes
     int num_ennemis_echapes;
     //nombre d'ennemis tues
@@ -95,9 +101,14 @@ private: //attributes
     QTimer timer;
     /** Timer for ennemy spawning */
     QTimer ennemiTimer;
+    
+    QTimer balleTimer;
     /** Time accessor */
     QTime time;
+    
     QPixmap *pixmap;
+    
+    Ui::MainWindow *ui; // pour actualiser la fenetre
 
 };
 

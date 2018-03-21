@@ -18,8 +18,8 @@
 #define WINDOW_WIDTH 821
 #define WINDOW_HEIGHT 541
 
-#define TAILLE_VAISSEAU_X 180
-#define TAILLE_VAISSEAU_Y 75
+#define TAILLE_VAISSEAU_X 100
+#define TAILLE_VAISSEAU_Y 60
 
 #define TAILLE_ENNEMI_X 80
 #define TAILLE_ENNEMI_Y 60
@@ -32,6 +32,7 @@
 render_area::render_area(QWidget *parent)
           :QWidget(parent),
           isGameStarted(false),
+          onPeutTirer(true),
           num_ennemis_echapes(0),
           num_ennemis_tues(0),
           fond1(), // fond
@@ -43,6 +44,7 @@ render_area::render_area(QWidget *parent)
           dt(1/5.0f),
           timer(),
           ennemiTimer(),
+	  balleTimer(),
           time()
 {
     setBackgroundRole(QPalette::Base);
@@ -54,6 +56,11 @@ render_area::render_area(QWidget *parent)
     //timer calling the function update_timer periodicaly
     connect(&ennemiTimer, SIGNAL(timeout()), this, SLOT(spawn_ennemi()));
     ennemiTimer.start(5000); //every 5000ms=5s
+    //timer calling the function update_timer periodicaly
+    connect(&balleTimer, SIGNAL(timeout()), this, SLOT(enable_shot()));
+    
+    
+
 
    //fond loadImage
    fond1.pixmap->load("images/background.png");
@@ -75,6 +82,11 @@ render_area::~render_area()
 void render_area::start_game(){
   isGameStarted = true;
 }
+
+void render_area::setUi(Ui::MainWindow *ui){
+  this->ui = ui; //oui
+}
+
 
 void render_area::paintEvent(QPaintEvent*)
 {
@@ -149,7 +161,7 @@ void render_area::collisions(){
 
     //ennemis qui ont ete frappe par un tire
     std::vector<Tire*>::iterator itTire;
-    for(itTire = tires.begin(); itTire != tires.end(); ){
+    for(itTire = tires.begin(); itTire != tires.end();){
         Tire* tire = *itTire;
         vec2 posTire = tire->getPosition();
         float tire_x_center = posTire.x + (TAILLE_TIRE_X/2);
@@ -157,24 +169,46 @@ void render_area::collisions(){
         //calculer la distance entre les 2 centres
         float dist = std::sqrt( std::pow((ennemi_x_center -tire_x_center), 2) + std::pow((ennemi_y_center -tire_y_center), 2));
         if(dist < DIST_HIT){
+	  //debug
+          //std::cout << "---------\n woooohoooo!!! HIT!!!\n-----------\n\n\n";
+          //std::cout << " num_ennemis_tues : "<<num_ennemis_tues << '\n'<< "num_ennemis_echapes : "<<num_ennemis_echapes<<'\n';
           //increment counter
           num_ennemis_tues += 1;
-          std::cout << "---------\n woooohoooo!!! HIT!!!\n-----------\n\n\n";
-          std::cout << " num_ennemis_tues : "<<num_ennemis_tues << '\n'<< "num_ennemis_echapes : "<<num_ennemis_echapes<<'\n';
           // destruir ennemi et tire
-          //tire->~Tire();
-          //ennemi->~Ennemi();
           delete tire;
           delete ennemi;
           it = ennemis.erase(it);
           itTire = tires.erase(itTire);
+	  // actualiser l'ecran
+	  std::string numEnnemisTuesString = std::to_string(num_ennemis_tues);
+	  ui->label_4->setText(QString::fromStdString(numEnnemisTuesString));
           ennemiFrappe = true;
         }else{
           itTire++;
         }
     }
+    vec2 posVaisseau = vaisseau.getPosition();
+    float vaisseau_x_center = posVaisseau.x + (TAILLE_VAISSEAU_X/2);
+    float vaisseau_y_center = posVaisseau.y + (TAILLE_VAISSEAU_Y/2);
+    //calculer la distance entre les 2 centres
+    float dist = std::sqrt( std::pow((ennemi_x_center -vaisseau_x_center), 2) + std::pow((ennemi_y_center -vaisseau_y_center), 2));
+    if(dist < TAILLE_VAISSEAU_Y/2+TAILLE_ENNEMI_Y/2){
+	  //debug
+	  //std::cout << "---------\n booooooo!!! mort!!!\n-----------\n\n\n";
+      
+          //destruir l'ennemi
+	  delete ennemi;
+          it = ennemis.erase(it);
+          ennemiFrappe = true;
+	  // perdre 1 vie
+	  vaisseau.perdreUneVie();
+	  int numVies = vaisseau.getNumVies();
+	  std::string numViesString = std::to_string(numVies);
+	  ui->label_2->setText(QString::fromStdString(numViesString));
+      
+    }
     if (ennemiFrappe == false) {
-      it++;
+	it++;
     }
   }
 }
@@ -205,9 +239,13 @@ void render_area::keyPressEvent(QKeyEvent *event)
   //tire
    if(event->key() == Qt::Key_Space) {
       //std::cout<<"space"<<std::endl;
-      vec2 pos = vaisseau.getPosition();
-      Tire* tire=new Tire(pos.x + TAILLE_VAISSEAU_X - 30, pos.y + TAILLE_VAISSEAU_Y/2 - 12);
-      tires.push_back(tire);
+     if(onPeutTirer == true){
+	vec2 pos = vaisseau.getPosition();
+	Tire* tire=new Tire(pos.x + TAILLE_VAISSEAU_X - 30, pos.y + TAILLE_VAISSEAU_Y/2 - 12);
+	tires.push_back(tire);
+	balleTimer.start(500); // a chaque 0.5sec
+	onPeutTirer = false;
+     }
   }
 
 }
@@ -244,14 +282,22 @@ void render_area::update_timer()
     repaint(); // affichage des objects
 }
 
+void render_area::enable_shot()
+{
+    //called periodically (every 1s apres)
+    onPeutTirer = true;
+}
+
 void render_area::spawn_ennemi()
 {
     //called periodically (every 5s)
     //if(isGameStarted){
       Ennemi* nouveauEnnemi = new Ennemi();
       ennemis.push_back(nouveauEnnemi);
-      std::cout<<"spawn ennemi!! \nnum ennemis :"<< ennemis.size() <<std::endl;
-      std::cout<<"num tires :"<< tires.size() <<std::endl;
+      
+      //debug
+      //std::cout<<"spawn ennemi!! \nnum ennemis :"<< ennemis.size() <<std::endl;
+      //std::cout<<"num tires :"<< tires.size() <<std::endl;
 
 
       std::vector<Ennemi*>::iterator it;
@@ -266,6 +312,8 @@ void render_area::spawn_ennemi()
           it = ennemis.erase(it);
           //increment counter
           num_ennemis_echapes += 1;
+	  std::string numEnnemisEchapesString = std::to_string(num_ennemis_echapes);
+	  ui->label_6->setText(QString::fromStdString(numEnnemisEchapesString));
         }else{
           it++;
         }
@@ -280,10 +328,10 @@ void render_area::spawn_ennemi()
         vec2 pos = tire->getPosition();
         // tires qui ont passe l'ecran
         if(pos.x >= WINDOW_WIDTH + 200){
+	  //debug
+          //std::cout<<"TIRE LOIN!! \nnum tires :"<< tires.size() <<std::endl;
+          //std::cout<<"tire position : "<< tire->getPosition() <<std::endl;
           //destroy the object
-          std::cout<<"TIRE LOIN!! \nnum tires :"<< tires.size() <<std::endl;
-          std::cout<<"tire position : "<< tire->getPosition() <<std::endl;
-          //delete tires[index];
           delete tire;
           itTire = tires.erase(itTire);
         }else{
