@@ -11,14 +11,14 @@
 #define WINDOW_WIDTH 821
 #define WINDOW_HEIGHT 541
 
-#define TAILLE_ENNEMI_X 80
-#define TAILLE_ENNEMI_Y 60
+#define TAILLE_ENNEMI_X 180//80
+#define TAILLE_ENNEMI_Y 250//60
 
 
 Ennemi::Ennemi()
 {
     std::cout<<"Constructor of Ennemi is called"<<std::endl;
-    pixmap->load("images/alien.png");
+    pixmap->load("images/alien2.png");
     // prendre un nombre aleatoire entre 0 et 1
     std::random_device r;
     std::default_random_engine e1(r());

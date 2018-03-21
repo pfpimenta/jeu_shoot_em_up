@@ -38,7 +38,7 @@ public:
 
     // start game : start spawning of ennemis
     void start_game();
-    
+
     void setUi(Ui::MainWindow *ui);
 
 
@@ -63,26 +63,25 @@ private: //functions
     void collisions();
     //mouvement des objects (vaisseau, ennemis, tires,...)
     void mouvement();
-    /** Insert current position and time inside the recording structures */
-    void store_values(vec2 const& click);
-
-    /** Deal with collision */
-    vec2 collision_handling(vec2& p);
-
-    /** Move forward in time */
-    void numerical_integration();
 
 private: //attributes
 
     // flag for game started
     bool isGameStarted;
+    // flag for game over
+    bool isGameOver;
     // flag for being able to shot
     bool onPeutTirer;
     //nombre d'ennemis echapes
     int num_ennemis_echapes;
     //nombre d'ennemis tues
     int num_ennemis_tues;
+    // compteur pour les nomes de fois que
+    // la fonction spawn_ennemi a ete appellee
+    int spawn_counter;
 
+    // game over text
+    Objet_bougeant game_over_text;
     // fond
     Objet_bougeant fond1;
     Objet_bougeant fond2;
@@ -92,22 +91,17 @@ private: //attributes
     std::vector<Ennemi*> ennemis;
     std::vector<Tire*> tires;
 
-    /** The speed of the circle */
-    vec2 speed;
-    /** The time integration step */
-    float dt;
-
     /** Timer for periodic time iteration */
     QTimer timer;
     /** Timer for ennemy spawning */
     QTimer ennemiTimer;
-    
+
     QTimer balleTimer;
     /** Time accessor */
     QTime time;
-    
+
     QPixmap *pixmap;
-    
+
     Ui::MainWindow *ui; // pour actualiser la fenetre
 
 };

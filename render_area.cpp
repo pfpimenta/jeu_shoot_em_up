@@ -21,11 +21,16 @@
 #define TAILLE_VAISSEAU_X 100
 #define TAILLE_VAISSEAU_Y 60
 
-#define TAILLE_ENNEMI_X 80
-#define TAILLE_ENNEMI_Y 60
+#define TAILLE_ENNEMI_X 180//80
+#define TAILLE_ENNEMI_Y 250//60
 
-#define TAILLE_TIRE_X 20
-#define TAILLE_TIRE_Y 18
+#define TAILLE_TIRE_X 24
+#define TAILLE_TIRE_Y 16
+
+#define TAILLE_GAME_OVER_TEXT_X 300
+#define TAILLE_GAME_OVER_TEXT_Y 200
+
+#define VITESSE_VAISSEAU 5
 
 #define DIST_HIT 30 //''hitbox''
 
@@ -35,16 +40,16 @@ render_area::render_area(QWidget *parent)
           onPeutTirer(true),
           num_ennemis_echapes(0),
           num_ennemis_tues(0),
+          spawn_counter(0),
+          game_over_text(),
           fond1(), // fond
           fond2(), // fond
           vaisseau(),
           ennemis(),
           tires(),
-          speed(0.0f,0.0f),
-          dt(1/5.0f),
           timer(),
           ennemiTimer(),
-	  balleTimer(),
+	        balleTimer(),
           time()
 {
     setBackgroundRole(QPalette::Base);
@@ -58,9 +63,12 @@ render_area::render_area(QWidget *parent)
     ennemiTimer.start(5000); //every 5000ms=5s
     //timer calling the function update_timer periodicaly
     connect(&balleTimer, SIGNAL(timeout()), this, SLOT(enable_shot()));
-    
-    
 
+
+
+    //game_over_text load image
+    game_over_text.pixmap->load("images/game_over.png");
+    game_over_text.setPosition((WINDOW_WIDTH- TAILLE_GAME_OVER_TEXT_X)/2, (WINDOW_HEIGHT - TAILLE_GAME_OVER_TEXT_Y)/2);
 
    //fond loadImage
    fond1.pixmap->load("images/background.png");
@@ -81,6 +89,7 @@ render_area::~render_area()
 
 void render_area::start_game(){
   isGameStarted = true;
+  this->setFocus();
 }
 
 void render_area::setUi(Ui::MainWindow *ui){
@@ -103,10 +112,12 @@ void render_area::paintEvent(QPaintEvent*)
     brush.setStyle(Qt::SolidPattern);
     painter.setBrush(brush);
 
+    vec2 pos;
+
 
 
      // afficher le fond
-    vec2 pos = fond1.getPosition();
+    pos = fond1.getPosition();
     painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond1.pixmap);
     pos = fond2.getPosition();
     painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond2.pixmap);
@@ -123,6 +134,11 @@ void render_area::paintEvent(QPaintEvent*)
     // afficher le vaisseau
     pos = vaisseau.getPosition();
     painter.drawPixmap(pos.x,pos.y,TAILLE_VAISSEAU_X,TAILLE_VAISSEAU_Y,*vaisseau.pixmap);
+    // afficher le text de game over
+    if(isGameOver == true){
+        pos = game_over_text.getPosition();
+        painter.drawPixmap(pos.x, pos.y, TAILLE_GAME_OVER_TEXT_X, TAILLE_GAME_OVER_TEXT_Y, *game_over_text.pixmap);
+    }
 }
 
 void render_area::mouvement(){
@@ -195,7 +211,7 @@ void render_area::collisions(){
     if(dist < TAILLE_VAISSEAU_Y/2+TAILLE_ENNEMI_Y/2){
 	  //debug
 	  //std::cout << "---------\n booooooo!!! mort!!!\n-----------\n\n\n";
-      
+
           //destruir l'ennemi
 	  delete ennemi;
           it = ennemis.erase(it);
@@ -205,7 +221,7 @@ void render_area::collisions(){
 	  int numVies = vaisseau.getNumVies();
 	  std::string numViesString = std::to_string(numVies);
 	  ui->label_2->setText(QString::fromStdString(numViesString));
-      
+
     }
     if (ennemiFrappe == false) {
 	it++;
@@ -218,35 +234,38 @@ void render_area::keyPressEvent(QKeyEvent *event)
   //std::cout<<"keyPressEvent appelle"<<std::endl;
   vec2 vitesse = vaisseau.getSpeed();
 
-  //mouvement horizontal
-  if(event->key() == Qt::Key_Left) {
-     // std::cout<<"left"<<std::endl;
-	vaisseau.setSpeed(-5, vitesse.y);
-  }else if(event->key() == Qt::Key_Right) {
-      //std::cout<<"right"<<std::endl;
-	vaisseau.setSpeed(5, vitesse.y);
+  // stop movement if game is over
+  if(isGameOver == false){
+      //mouvement horizontal
+      if(event->key() == Qt::Key_Left) {
+         // std::cout<<"left"<<std::endl;
+    	vaisseau.setSpeed(-VITESSE_VAISSEAU, vitesse.y);
+      }else if(event->key() == Qt::Key_Right) {
+          //std::cout<<"right"<<std::endl;
+    	vaisseau.setSpeed(VITESSE_VAISSEAU, vitesse.y);
+      }
+      // mouvement vertical
+      if(event->key() == Qt::Key_Down) {
+          //std::cout<<"down"<<std::endl;
+          vaisseau.setSpeed(vitesse.x, VITESSE_VAISSEAU);
+      }else if(event->key() == Qt::Key_Up) {
+          //std::cout<<"up"<<std::endl;
+    	vaisseau.setSpeed(vitesse.x, -VITESSE_VAISSEAU);
+      }
+      //tire
+      if(event->key() == Qt::Key_Space) {
+          //std::cout<<"space"<<std::endl;
+          if(onPeutTirer == true){
+              vec2 pos = vaisseau.getPosition();
+              Tire* tire=new Tire(pos.x + TAILLE_VAISSEAU_X - 30, pos.y + TAILLE_VAISSEAU_Y/2 - 12);
+              tires.push_back(tire);
+              balleTimer.start(500); // a chaque 0.5sec
+              onPeutTirer = false;
+          }
+      }
+
   }
 
-  // mouvement vertical
-  if(event->key() == Qt::Key_Down) {
-      //std::cout<<"down"<<std::endl;
-      vaisseau.setSpeed(vitesse.x, 5);
-  }else if(event->key() == Qt::Key_Up) {
-      //std::cout<<"up"<<std::endl;
-	vaisseau.setSpeed(vitesse.x, -5);
-  }
-
-  //tire
-   if(event->key() == Qt::Key_Space) {
-      //std::cout<<"space"<<std::endl;
-     if(onPeutTirer == true){
-	vec2 pos = vaisseau.getPosition();
-	Tire* tire=new Tire(pos.x + TAILLE_VAISSEAU_X - 30, pos.y + TAILLE_VAISSEAU_Y/2 - 12);
-	tires.push_back(tire);
-	balleTimer.start(500); // a chaque 0.5sec
-	onPeutTirer = false;
-     }
-  }
 
 }
 
@@ -280,6 +299,13 @@ void render_area::update_timer()
     collisions(); // traiter les colisions
     mouvement(); // mouvement des objects
     repaint(); // affichage des objects
+
+    //check for death
+    if ( vaisseau.getNumVies() == 0){
+      //debug
+      //std::cout << "\n\n GAME OVER \n\n\n";
+      isGameOver = true;
+    }
 }
 
 void render_area::enable_shot()
@@ -291,10 +317,13 @@ void render_area::enable_shot()
 void render_area::spawn_ennemi()
 {
     //called periodically (every 5s)
-    //if(isGameStarted){
+    spawn_counter ++;
+    //isGameStarted = true;
+    std::cout<<"is game started? "<<isGameStarted<<"\n";
+    if(isGameStarted){
       Ennemi* nouveauEnnemi = new Ennemi();
       ennemis.push_back(nouveauEnnemi);
-      
+
       //debug
       //std::cout<<"spawn ennemi!! \nnum ennemis :"<< ennemis.size() <<std::endl;
       //std::cout<<"num tires :"<< tires.size() <<std::endl;
@@ -312,8 +341,8 @@ void render_area::spawn_ennemi()
           it = ennemis.erase(it);
           //increment counter
           num_ennemis_echapes += 1;
-	  std::string numEnnemisEchapesString = std::to_string(num_ennemis_echapes);
-	  ui->label_6->setText(QString::fromStdString(numEnnemisEchapesString));
+	        std::string numEnnemisEchapesString = std::to_string(num_ennemis_echapes);
+	        ui->label_6->setText(QString::fromStdString(numEnnemisEchapesString));
         }else{
           it++;
         }
@@ -328,7 +357,7 @@ void render_area::spawn_ennemi()
         vec2 pos = tire->getPosition();
         // tires qui ont passe l'ecran
         if(pos.x >= WINDOW_WIDTH + 200){
-	  //debug
+	        //debug
           //std::cout<<"TIRE LOIN!! \nnum tires :"<< tires.size() <<std::endl;
           //std::cout<<"tire position : "<< tire->getPosition() <<std::endl;
           //destroy the object
@@ -339,7 +368,8 @@ void render_area::spawn_ennemi()
           index++;
         }
       }
-    //}else{
+    }else{
       // le jeu n'a pas commence encore
-    //}
+      std::cout << "le jeu n'a pas commence encore" << '\n';
+    }
 }
