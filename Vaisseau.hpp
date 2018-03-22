@@ -14,7 +14,7 @@
 
 class Vaisseau : public Navette
 {
-  
+
 public:
     Vaisseau();
     ~Vaisseau();
@@ -22,6 +22,7 @@ public:
     void move();
     void perdreUneVie();
     int  getNumVies();
+    void setNumVies(int new_num_vies);
     void debugFonction();
 
 private:

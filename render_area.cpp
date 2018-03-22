@@ -31,6 +31,8 @@
 #define TAILLE_GAME_OVER_TEXT_Y 200
 
 #define VITESSE_VAISSEAU 5
+#define NUM_VIES_INITIAL 3
+
 
 #define DIST_HIT 30 //''hitbox''
 
@@ -41,6 +43,9 @@ render_area::render_area(QWidget *parent)
           num_ennemis_echapes(0),
           num_ennemis_tues(0),
           spawn_counter(0),
+          ennemisSpeed(1),
+          num_ennemis_par_wave(1),
+          ennemisSpawnSpeed(2500),
           game_over_text(),
           fond1(), // fond
           fond2(), // fond
@@ -60,7 +65,7 @@ render_area::render_area(QWidget *parent)
     timer.start(30); //every 30ms
     //timer calling the function update_timer periodicaly
     connect(&ennemiTimer, SIGNAL(timeout()), this, SLOT(spawn_ennemi()));
-    ennemiTimer.start(5000); //every 5000ms=5s
+    ennemiTimer.start(ennemisSpawnSpeed); //every 2500ms=2.5s
     //timer calling the function update_timer periodicaly
     connect(&balleTimer, SIGNAL(timeout()), this, SLOT(enable_shot()));
 
@@ -88,7 +93,43 @@ render_area::~render_area()
 {}
 
 void render_area::start_game(){
+  //restart game objects
+  std::vector<Ennemi*>::iterator it;
+  for (it = ennemis.begin(); it != ennemis.end(); )
+  {
+    Ennemi* ennemi = *it;
+    //destroy the object
+    delete ennemi;
+    it = ennemis.erase(it);
+  }
+
+  std::vector<Tire*>::iterator itTire;
+  for (itTire = tires.begin(); itTire != tires.end(); )
+  {
+    Tire* tire = *itTire;
+    //destroy the object
+    delete tire;
+    itTire = tires.erase(itTire);
+  }
+  // reposition du vaisseau
+  vaisseau.setNumVies(NUM_VIES_INITIAL);
+  vaisseau.setPosition(100, 200);
+  std::string numViesString = std::to_string(NUM_VIES_INITIAL);
+  ui->label_2->setText(QString::fromStdString(numViesString));
+
+  num_ennemis_echapes = 0;
+  std::string numEnnemisEchapesString = std::to_string(num_ennemis_echapes);
+  ui->label_6->setText(QString::fromStdString(numEnnemisEchapesString));
+  num_ennemis_tues = 0;
+  std::string numEnnemisTuesString = std::to_string(num_ennemis_tues);
+  ui->label_4->setText(QString::fromStdString(numEnnemisTuesString));
+  num_ennemis_par_wave = 1;
+  ennemisSpeed = 1;
+  spawn_counter = 0;
+  //flags
   isGameStarted = true;
+  isGameOver = false;
+
   this->setFocus();
 }
 
@@ -209,22 +250,21 @@ void render_area::collisions(){
     //calculer la distance entre les 2 centres
     float dist = std::sqrt( std::pow((ennemi_x_center -vaisseau_x_center), 2) + std::pow((ennemi_y_center -vaisseau_y_center), 2));
     if(dist < TAILLE_VAISSEAU_Y/2+TAILLE_ENNEMI_Y/2){
-	  //debug
-	  //std::cout << "---------\n booooooo!!! mort!!!\n-----------\n\n\n";
+        //debug
+        //std::cout << "---------\n booooooo!!! mort!!!\n-----------\n\n\n";
 
-          //destruir l'ennemi
-	  delete ennemi;
-          it = ennemis.erase(it);
-          ennemiFrappe = true;
-	  // perdre 1 vie
-	  vaisseau.perdreUneVie();
-	  int numVies = vaisseau.getNumVies();
-	  std::string numViesString = std::to_string(numVies);
-	  ui->label_2->setText(QString::fromStdString(numViesString));
-
+        //destruir l'ennemi
+        delete ennemi;
+        it = ennemis.erase(it);
+        ennemiFrappe = true;
+        // perdre 1 vie
+        vaisseau.perdreUneVie();
+        int numVies = vaisseau.getNumVies();
+        std::string numViesString = std::to_string(numVies);
+        ui->label_2->setText(QString::fromStdString(numViesString));
     }
     if (ennemiFrappe == false) {
-	it++;
+	     it++;
     }
   }
 }
@@ -259,7 +299,7 @@ void render_area::keyPressEvent(QKeyEvent *event)
               vec2 pos = vaisseau.getPosition();
               Tire* tire=new Tire(pos.x + TAILLE_VAISSEAU_X - 30, pos.y + TAILLE_VAISSEAU_Y/2 - 12);
               tires.push_back(tire);
-              balleTimer.start(500); // a chaque 0.5sec
+              balleTimer.start(300); // a chaque 0.3sec
               onPeutTirer = false;
           }
       }
@@ -296,7 +336,9 @@ void render_area::keyReleaseEvent(QKeyEvent *event)
 void render_area::update_timer()
 {
     //called periodically (every 30ms)
-    collisions(); // traiter les colisions
+    if( (isGameOver == false) && (isGameStarted==true)){
+      collisions(); // traiter les colisions
+    }
     mouvement(); // mouvement des objects
     repaint(); // affichage des objects
 
@@ -310,25 +352,46 @@ void render_area::update_timer()
 
 void render_area::enable_shot()
 {
-    //called periodically (every 1s apres)
+    //called periodically
     onPeutTirer = true;
 }
 
 void render_area::spawn_ennemi()
 {
-    //called periodically (every 5s)
-    spawn_counter ++;
-    //isGameStarted = true;
-    std::cout<<"is game started? "<<isGameStarted<<"\n";
-    if(isGameStarted){
-      Ennemi* nouveauEnnemi = new Ennemi();
-      ennemis.push_back(nouveauEnnemi);
+    //called periodically
+    //debug
+    //std::cout<<"is game started? "<<isGameStarted<<"\n";
+    if((isGameStarted == true)&&(isGameOver == false)){
+      spawn_counter ++;
+      if(spawn_counter % 15 == 0){
+        // ennemis moins vites
+        ennemisSpeed--;
+        // ennemis sont nes moins frequentement
+        ennemisSpawnSpeed = 500 + ennemisSpawnSpeed;
+        ennemiTimer.start(ennemisSpawnSpeed);
+        // plus 1 ennemi par waves
+        num_ennemis_par_wave++;
+      }else if(spawn_counter % 5 == 0){
+        //vitesse augmente a chaque 5 waves
+        ennemisSpeed++;
+        // ennemis sont nes plus frequentement
+        ennemisSpawnSpeed = 100 + 7*ennemisSpawnSpeed/10;
+        ennemiTimer.start(ennemisSpawnSpeed);
+      }
+      int i;
+      //spawn ennemis
+      for(i = 0; i < num_ennemis_par_wave; i++ ){
+          Ennemi* nouveauEnnemi = new Ennemi();
+          vec2 nouveauEnnemiSpeed = nouveauEnnemi->getSpeed();
+          vec2 nouveauEnnemiPos = nouveauEnnemi->getPosition();
+          nouveauEnnemi->setSpeed( - ennemisSpeed, nouveauEnnemiSpeed.y);
+          nouveauEnnemi->setPosition( nouveauEnnemiPos.x + i*TAILLE_ENNEMI_X/2, nouveauEnnemiPos.y);
+          ennemis.push_back(nouveauEnnemi);
+      }
 
       //debug
       //std::cout<<"spawn ennemi!! \nnum ennemis :"<< ennemis.size() <<std::endl;
       //std::cout<<"num tires :"<< tires.size() <<std::endl;
-
-
       std::vector<Ennemi*>::iterator it;
       for (it = ennemis.begin(); it != ennemis.end(); )
   	  {
@@ -370,6 +433,7 @@ void render_area::spawn_ennemi()
       }
     }else{
       // le jeu n'a pas commence encore
-      std::cout << "le jeu n'a pas commence encore" << '\n';
+      // ou c'est deja game over
+      //std::cout << "le jeu n'a pas commence encore" << '\n';
     }
 }

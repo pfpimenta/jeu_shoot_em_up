@@ -41,6 +41,10 @@ int Vaisseau::getNumVies(){
   return this->num_vies;
 }
 
+void Vaisseau::setNumVies(int new_num_vies){
+  this->num_vies = new_num_vies;
+}
+
 
 void Vaisseau::debugFonction(){
       std::cout<<"DEBUG VAISSEAU"<<std::endl;

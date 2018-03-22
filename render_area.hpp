@@ -79,6 +79,12 @@ private: //attributes
     // compteur pour les nomes de fois que
     // la fonction spawn_ennemi a ete appellee
     int spawn_counter;
+    // vitesse des ennemis
+    int ennemisSpeed;
+    // vitesse des ennemis
+    int num_ennemis_par_wave;
+    // temps pour entre les spawn des ennemis
+    int ennemisSpawnSpeed;
 
     // game over text
     Objet_bougeant game_over_text;
