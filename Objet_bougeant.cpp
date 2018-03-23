@@ -10,13 +10,13 @@
 
 Objet_bougeant::Objet_bougeant():      pixmap(new QPixmap)
 {
-    std::cout<<"Constructor of Objet_bougeant is called"<<std::endl;
+    //std::cout<<"Constructor of Objet_bougeant is called"<<std::endl;//debug
     setPosition(0, 0);
 }
 
 Objet_bougeant::~Objet_bougeant()
 {
-    std::cout<<"Destructor of Objet_bougeant is called"<<std::endl;
+    //std::cout<<"Destructor of Objet_bougeant is called"<<std::endl;//debug
 }
 
 void Objet_bougeant::setPosition(int x, int y){
@@ -44,6 +44,16 @@ vec2 Objet_bougeant::getSpeed(){
   return this->speed;
 }
 
+QPixmap* Objet_bougeant::getPixmap(){
+  return this->pixmap;
+}
+void Objet_bougeant::setPixmap(QPixmap* pixmap){
+  this->pixmap = pixmap;
+}
+
+void Objet_bougeant::loadImage(const char* imgName){
+  this->pixmap->load(imgName);
+}
 
 void Objet_bougeant::move(){
   this->position = vec2(this->position.x+this->speed.x, this->position.y+this->speed.y);

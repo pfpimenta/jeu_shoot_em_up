@@ -19,12 +19,10 @@ class Vaisseau : public Objet_bougeant
 public:
     Vaisseau();
     ~Vaisseau();
-    //void setPosition(int x, int y);
     void move();
     void perdreUneVie();
     int  getNumVies();
     void setNumVies(int new_num_vies);
-    void debugFonction();
 
 private:
   int num_vies;

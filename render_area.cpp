@@ -34,7 +34,7 @@
 #define NUM_VIES_INITIAL 3
 
 
-#define DIST_HIT 30 //''hitbox''
+#define DIST_HIT 30 //''hitbox'' pour tirer aus ennemis
 
 render_area::render_area(QWidget *parent)
           :QWidget(parent),
@@ -70,23 +70,23 @@ render_area::render_area(QWidget *parent)
     connect(&balleTimer, SIGNAL(timeout()), this, SLOT(enable_shot()));
 
 
+    QPixmap *pixmap_game_over = new QPixmap(); // l'image
 
     //game_over_text load image
-    game_over_text.pixmap->load("images/game_over.png");
+   pixmap_game_over->load("images/game_over.png");
+    game_over_text.setPixmap(pixmap_game_over);
     game_over_text.setPosition((WINDOW_WIDTH- TAILLE_GAME_OVER_TEXT_X)/2, (WINDOW_HEIGHT - TAILLE_GAME_OVER_TEXT_Y)/2);
 
+    
+    QPixmap *pixmap_fond = new QPixmap(); // l'image
    //fond loadImage
-   fond1.pixmap->load("images/background.png");
-   fond2.pixmap->load("images/background.png");
+   pixmap_fond->load("images/background.png");
+   fond1.setPixmap(pixmap_fond);
+   fond2.setPixmap(pixmap_fond);
 
    fond1.setSpeed(-1,0);
    fond2.setSpeed(-1,0);
    fond2.setPosition(WINDOW_WIDTH,0);
-
-   // ennemi
-   //Ennemi* testEnnemi = new Ennemi();
-   //ennemis.push_back(testEnnemi);
-
 }
 
 render_area::~render_area()
@@ -125,6 +125,7 @@ void render_area::start_game(){
   ui->label_4->setText(QString::fromStdString(numEnnemisTuesString));
   num_ennemis_par_wave = 1;
   ennemisSpeed = 1;
+  ennemisSpawnSpeed = 2500;
   spawn_counter = 0;
   //flags
   isGameStarted = true;
@@ -156,29 +157,36 @@ void render_area::paintEvent(QPaintEvent*)
     vec2 pos;
 
 
+    QPixmap *pixmap = new QPixmap(); // l'image
 
-     // afficher le fond
+    // afficher le fond
     pos = fond1.getPosition();
-    painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond1.pixmap);
+    pixmap = fond1.getPixmap();
+    painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*pixmap);
     pos = fond2.getPosition();
-    painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*fond2.pixmap);
+    pixmap = fond2.getPixmap();
+    painter.drawPixmap(pos.x,pos.y,WINDOW_WIDTH,WINDOW_HEIGHT,*pixmap);
      // afficher les ennemis
     for(auto& ennemi : ennemis){
         pos = ennemi->getPosition();
-	      painter.drawPixmap(pos.x,pos.y,TAILLE_ENNEMI_X,TAILLE_ENNEMI_Y,*ennemi->pixmap);
+	pixmap =ennemi->getPixmap();
+	painter.drawPixmap(pos.x,pos.y,TAILLE_ENNEMI_X,TAILLE_ENNEMI_Y,*pixmap);
     }
     //afficher les tirs
     for(auto& tire : tires){
         pos = tire->getPosition();
-	      painter.drawPixmap(pos.x,pos.y,TAILLE_TIRE_X,TAILLE_TIRE_Y,*tire->pixmap);
+	pixmap = tire->getPixmap();
+	painter.drawPixmap(pos.x,pos.y,TAILLE_TIRE_X,TAILLE_TIRE_Y,*pixmap);
     }
     // afficher le vaisseau
     pos = vaisseau.getPosition();
-    painter.drawPixmap(pos.x,pos.y,TAILLE_VAISSEAU_X,TAILLE_VAISSEAU_Y,*vaisseau.pixmap);
+    pixmap = vaisseau.getPixmap();
+    painter.drawPixmap(pos.x,pos.y,TAILLE_VAISSEAU_X,TAILLE_VAISSEAU_Y,*pixmap);
     // afficher le text de game over
     if(isGameOver == true){
         pos = game_over_text.getPosition();
-        painter.drawPixmap(pos.x, pos.y, TAILLE_GAME_OVER_TEXT_X, TAILLE_GAME_OVER_TEXT_Y, *game_over_text.pixmap);
+	pixmap = game_over_text.getPixmap();
+        painter.drawPixmap(pos.x, pos.y, TAILLE_GAME_OVER_TEXT_X, TAILLE_GAME_OVER_TEXT_Y, *pixmap);
     }
 }
 
@@ -352,7 +360,7 @@ void render_area::update_timer()
 
 void render_area::enable_shot()
 {
-    //called periodically
+    //called  0.3sec apres chaque tire
     onPeutTirer = true;
 }
 
@@ -392,6 +400,7 @@ void render_area::spawn_ennemi()
       //debug
       //std::cout<<"spawn ennemi!! \nnum ennemis :"<< ennemis.size() <<std::endl;
       //std::cout<<"num tires :"<< tires.size() <<std::endl;
+      //traiter les ennemis qui ont passe 'lecran
       std::vector<Ennemi*>::iterator it;
       for (it = ennemis.begin(); it != ennemis.end(); )
   	  {
@@ -412,6 +421,7 @@ void render_area::spawn_ennemi()
       }
 
 
+      // traiter les tires qui ont passe l'ecran
       int index = 0;
       std::vector<Tire*>::iterator itTire;
       for (itTire = tires.begin(); itTire != tires.end(); )
@@ -434,6 +444,6 @@ void render_area::spawn_ennemi()
     }else{
       // le jeu n'a pas commence encore
       // ou c'est deja game over
-      //std::cout << "le jeu n'a pas commence encore" << '\n';
+      //std::cout << "le jeu n'a pas commence encore" << '\n'; //debug
     }
 }

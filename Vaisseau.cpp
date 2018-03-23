@@ -22,7 +22,7 @@
 
 Vaisseau::Vaisseau()
 {
-    std::cout<<"Constructor of Vaisseau is called"<<std::endl;
+    //std::cout<<"Constructor of Vaisseau is called"<<std::endl;//debug
     pixmap->load("images/vaisseau.png");
     this->setPosition(100, 200);
     this->setSpeed(0, 0);
@@ -31,12 +31,12 @@ Vaisseau::Vaisseau()
 
 Vaisseau::~Vaisseau()
 {
-    std::cout<<"Destructor of Vaisseau is called"<<std::endl;
+    //std::cout<<"Destructor of Vaisseau is called"<<std::endl;//debug
 }
 
 void Vaisseau::perdreUneVie(){
       this->num_vies -= 1;
-      std::cout<<"num vies"<<this->num_vies<<std::endl;
+      //std::cout<<"num vies"<<this->num_vies<<std::endl; //debug
 }
 
 int Vaisseau::getNumVies(){
@@ -47,15 +47,12 @@ void Vaisseau::setNumVies(int new_num_vies){
   this->num_vies = new_num_vies;
 }
 
-
-void Vaisseau::debugFonction(){
-      std::cout<<"DEBUG VAISSEAU"<<std::endl;
-}
-
 void Vaisseau::move(){
 
   int x = (int) this->getPosition().x+this->getSpeed().x;
   int y = (int) this->getPosition().y+this->getSpeed().y;
+  
+  //eviter que le vaisseau sort de l'ecran
   if(x > WINDOW_WIDTH -TAILLE_VAISSEAU_X)
     x = WINDOW_WIDTH  - TAILLE_VAISSEAU_X;
   if(x < 0)
@@ -64,5 +61,6 @@ void Vaisseau::move(){
     y = WINDOW_HEIGHT - TAILLE_VAISSEAU_Y;
   if(y < 0)
     y = 0;
+  
   this->setPosition(x, y);
 }

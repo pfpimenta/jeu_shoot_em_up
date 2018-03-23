@@ -4,7 +4,6 @@
 // TP 2
 
 //includes
-
 #include "Tire.hpp"
 
 
@@ -15,13 +14,13 @@
 
 Tire::Tire()
 {
-    std::cout<<"Constructor of Tire is called"<<std::endl;
+    //std::cout<<"Constructor of Tire is called"<<std::endl;//debug
     pixmap->load("images/tire.png");
-    setSpeed(-1, 0);
+    setSpeed(TIRE_SPEED, 0);
 }
 Tire::Tire(int x, int y)
 {
-    std::cout<<"Constructor of Tire is called"<<std::endl;
+    //std::cout<<"Constructor of Tire is called"<<std::endl;//debug
     pixmap->load("images/tire.png");
     setPosition(x, y);
     setSpeed(TIRE_SPEED, 0);
@@ -30,5 +29,5 @@ Tire::Tire(int x, int y)
 
 Tire::~Tire()
 {
-    std::cout<<"Destructor of Tire is called"<<std::endl;
+    //std::cout<<"Destructor of Tire is called"<<std::endl;//debug
 }

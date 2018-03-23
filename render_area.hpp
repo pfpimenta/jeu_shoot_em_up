@@ -9,8 +9,7 @@
 #ifndef RENDER_AREA_HPP
 #define RENDER_AREA_HPP
 
-#include "circle.hpp"
-
+//includes
 #include <QWidget>
 #include <QTimer>
 #include <QTime>

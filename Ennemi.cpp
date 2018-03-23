@@ -17,9 +17,9 @@
 
 Ennemi::Ennemi()
 {
-    std::cout<<"Constructor of Ennemi is called"<<std::endl;
+    //std::cout<<"Constructor of Ennemi is called"<<std::endl;//debug
     pixmap->load("images/alien.png");
-    // prendre un nombre aleatoire entre 0 et 1
+    // prendre un nombre aleatoire
     std::random_device r;
     std::default_random_engine e1(r());
     std::uniform_int_distribution<int> uniform_dist(1, 30);
@@ -36,7 +36,7 @@ Ennemi::Ennemi()
 
 Ennemi::~Ennemi()
 {
-    std::cout<<"Destructor of Ennemi is called"<<std::endl;
+   //std::cout<<"Destructor of Ennemi is called"<<std::endl;//debug
 }
 
 void Ennemi::move(){
@@ -45,8 +45,7 @@ void Ennemi::move(){
   int x = pos.x;
   int y = pos.y;
 
- // if(x < -10)
-    //destruir ennemi !!!!!!!!!!!!!!!!
+    // quand il arrive aux bords verticaux, changer de sense
   if((y+TAILLE_ENNEMI_Y) >= (WINDOW_HEIGHT) || y <= 0){
     setSpeed(getSpeed().x,-getSpeed().y);
   }

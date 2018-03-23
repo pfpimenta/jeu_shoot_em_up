@@ -27,13 +27,17 @@ public:
     void setSpeed(int x, int y);
     void setSpeed(vec2 newSpeed);
     vec2 getSpeed();
+    QPixmap* getPixmap();
+    void setPixmap(QPixmap* pixmap);
+    void loadImage(const char* imgName);
     void move();
-    QPixmap *pixmap; // l'image
-
+    
+protected:
+  QPixmap *pixmap; // l'image
+  
 private:
   vec2 position;
   vec2 speed;
-
 };
 
 

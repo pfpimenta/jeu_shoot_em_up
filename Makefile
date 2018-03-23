@@ -27,8 +27,8 @@ LDFLAGS=-pthread ${QT_DEPENDENCIES}
 CXX=g++
 
 
-main: main.o window.o moc_window.o render_area.o moc_render_area.o vec2.o circle.o Objet_bougeant.o Vaisseau.o Ennemi.o Tire.o
-	${CXX} $^ -o shoot_em_up ${LDFLAGS}
+main: main.o window.o moc_window.o render_area.o moc_render_area.o vec2.o Objet_bougeant.o Vaisseau.o Ennemi.o Tire.o
+	${CXX} $^ -o jeu_shoot_em_up ${LDFLAGS}
 
 main.o: main.cpp window.hpp
 window.o: window.cpp window.hpp ui_mainwindow.h
@@ -42,7 +42,6 @@ moc_render_area.cpp: render_area.hpp
 	${MOC} $< -o $@ ${QT_INCLUDE}
 
 vec2.o: vec2.cpp vec2.hpp
-circle.o: circle.cpp circle.hpp vec2.hpp
 Objet_bougeant.o: Objet_bougeant.cpp Objet_bougeant.hpp vec2.hpp
 Vaisseau.o: Vaisseau.cpp Vaisseau.hpp vec2.hpp
 Ennemi.o: Ennemi.cpp Ennemi.hpp vec2.hpp
@@ -52,4 +51,4 @@ ui_mainwindow.h: mainwindow.ui
 	${UIC} $< -o $@
 
 clean:
-	rm -f *~ *.o moc_* ui_* main shoot_em_up
+	rm -f *~ *.o moc_* ui_* main jeu_shoot_em_up
