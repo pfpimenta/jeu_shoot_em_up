@@ -9,10 +9,11 @@
 #define VAISSEAU_HPP
 
 //includes
+#include "Objet_bougeant.hpp"
 #include "vec2.hpp"
-#include "Navette.hpp"
 
-class Vaisseau : public Navette
+
+class Vaisseau : public Objet_bougeant
 {
 
 public:

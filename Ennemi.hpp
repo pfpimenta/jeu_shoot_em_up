@@ -9,18 +9,16 @@
 #define ENNEMI_HPP
 
 //includes
-#include "Navette.hpp"
+#include "Objet_bougeant.hpp"
 #include "vec2.hpp"
 
-class Ennemi : public Navette
+class Ennemi : public Objet_bougeant
 {
   
 public:
     Ennemi();
     ~Ennemi();
     void move();
-
-
 private:
 
   

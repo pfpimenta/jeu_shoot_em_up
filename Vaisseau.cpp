@@ -5,7 +5,9 @@
 
 //includes
 
+#include "Objet_bougeant.hpp"
 #include "Vaisseau.hpp"
+#include "vec2.hpp"
 #include <QKeyEvent>
 
 

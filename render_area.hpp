@@ -81,7 +81,7 @@ private: //attributes
     int spawn_counter;
     // vitesse des ennemis
     int ennemisSpeed;
-    // vitesse des ennemis
+    // nombre des ennemis par wave
     int num_ennemis_par_wave;
     // temps pour entre les spawn des ennemis
     int ennemisSpawnSpeed;
@@ -101,14 +101,12 @@ private: //attributes
     QTimer timer;
     /** Timer for ennemy spawning */
     QTimer ennemiTimer;
-
+    /** Timer pour le temps entre chaque tire */
     QTimer balleTimer;
     /** Time accessor */
     QTime time;
-
-    QPixmap *pixmap;
-
-    Ui::MainWindow *ui; // pour actualiser la fenetre
+    // pour actualiser la fenetre
+    Ui::MainWindow *ui;
 
 };
 

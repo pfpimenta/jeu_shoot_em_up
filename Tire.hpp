@@ -19,10 +19,7 @@ public:
     Tire();
     Tire(int x, int y);
     ~Tire();
-
-
 private:
-  
   
 };
 
