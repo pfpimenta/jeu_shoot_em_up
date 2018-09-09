@@ -15,6 +15,7 @@
 #include <QTime>
 #include <list>
 #include <vector>
+#include <cmath>
 
 #include "ui_mainwindow.h"
 #include "Vaisseau.hpp"

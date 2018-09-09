@@ -11,6 +11,7 @@
 //includes
 #include "Objet_bougeant.hpp"
 #include "vec2.hpp"
+#include <random>
 
 class Ennemi : public Objet_bougeant
 {
