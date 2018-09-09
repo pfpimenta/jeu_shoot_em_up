@@ -17,10 +17,10 @@ in the "Programmation en C++" class at CPE Lyon.
 
 
 ## how to execute the game
-'''
+```
 make
-'''
+```
 and then
-'''
+```
 ./jeu_shoot_em_up
-'''
+```
